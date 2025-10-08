@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INF2002 – Mini‑Essay Quiz #2 (45‑min mix)</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#94a3b8;--text:#e5e7eb;--brand:#2563eb;--card:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),#0c1426);border-bottom:1px solid #1f2937}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{margin:0 0 4px;font-size:22px}
+    .sub{color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{appearance:none;border:1px solid #2b3547;background:#111c30;color:var(--text);padding:8px 12px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:#2563eb;border-color:#2563eb;color:white}
+    .stat{display:inline-flex;align-items:center;gap:6px;border:1px solid #2b3547;padding:6px 10px;border-radius:999px;color:var(--muted)}
+    main{display:grid;grid-template-columns:1fr;gap:14px}
+    .card{background:var(--panel);border:1px solid #1f2937;border-radius:14px;padding:14px}
+    .q{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px}
+    .q h3{margin:0 0 4px;font-size:15px}
+    .meta{color:var(--muted);font-size:12px;margin-bottom:6px}
+    textarea{width:100%;min-height:76px;background:#0b1328;color:#e5e7eb;border:1px solid #263347;border-radius:10px;padding:10px;resize:vertical}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+    .pill{font-size:12px;border:1px solid #334155;border-radius:999px;padding:2px 8px;color:#c7d2fe}
+    .good{border-color:#065f46;color:#a7f3d0}
+    .bad{border-color:#7f1d1d;color:#fecaca}
+    .explain{margin-top:8px;color:var(--muted)}
+    footer{color:var(--muted);font-size:12px;padding:24px 16px}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+      <div>
+        <h1>INF2002 – Mini‑Essay Quiz #2</h1>
+        <div class="sub">45‑min paper mix • 8 short answers (1–2 lines) • 4 mini‑essays (3–5 lines) • 2 scenarios (applied)</div>
+      </div>
+      <div class="controls">
+        <span class="stat">Score: <b id="score">0</b>/<b id="total">14</b></span>
+        <span class="stat">Answered: <b id="answered">0</b>/14</span>
+        <button class="btn" id="save">Save</button>
+        <button class="btn" id="load">Load</button>
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn primary" id="reveal">Reveal All</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <h2 style="margin:0 0 8px">Short Answers (1–2 lines each) — 8 Qs</h2>
+      <div id="shorts" class="grid"></div>
+    </section>
+    <section class="card">
+      <h2 style="margin:0 0 8px">Mini‑Essays (3–5 lines each) — 4 Qs</h2>
+      <div id="minis" class="grid"></div>
+    </section>
+    <section class="card">
+      <h2 style="margin:0 0 8px">Scenarios (applied, 4–6 lines) — 2 Qs</h2>
+      <div id="scens" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div>Grounded in Lectures 1–6. Write concisely. Answers are auto‑checked by keywords; model answers explain expected coverage.</div>
+  </footer>
+
+<script>
+(function(){
+  // ---- Utility ----
+  const $ = sel => document.querySelector(sel);
+  function saveState(){ localStorage.setItem('inf2002_meq2', JSON.stringify(getState())); }
+  function loadState(){ try{const s = JSON.parse(localStorage.getItem('inf2002_meq2')||'{}'); if(!s||!s.a) return; s.a.forEach(({id,txt})=>{ const ta=document.getElementById(id); if(ta) ta.value=txt; }); }catch(e){} }
+  function getState(){ const a=[...document.querySelectorAll('textarea')].map(t=>({id:t.id,txt:t.value})); return {a}; }
+  function clampLines(textarea, minL, maxL){ const lines = textarea.value.trim().split(/\n|\r/).filter(x=>x.trim().length>0).length; return {ok: (lines>=minL && lines<=maxL), lines}; }
+  function scoreKeywords(txt, must=[], nice=[]){ txt = txt.toLowerCase(); const hit=(kw)=>kw.some(k=>txt.includes(k)); const mustHits = must.map(group=> hit(Array.isArray(group)?group:[group])); const niceHits = nice.map(group=> hit(Array.isArray(group)?group:[group])); return {mustHits, niceHits, mustCount:mustHits.filter(Boolean).length, niceCount:niceHits.filter(Boolean).length, mustTotal:must.length, niceTotal:nice.length}; }
+
+  // ---- Question banks ----
+  // Each item: { id, t, lines:[min,max], must:[[alts],...], nice:[[alts],...], model }
+  const SHORTS = [
+    {id:'s1', t:'Define usability per ISO 9241‑11.', lines:[1,2], must:[["effectiveness"],["efficiency"],["satisfaction"],["context of use","specified context"]], nice:[["specified users"],["goals"]], model:'Effectiveness, efficiency, and satisfaction, for specified users achieving goals in a specified context of use.'},
+    {id:'s2', t:'What is the goal of needfinding?', lines:[1,2], must:[["needs","problems","goals"],["before solutions","pre","prior"]], nice:[["evidence","data"],["users","context"]], model:'Uncover real user needs/problems and goals before proposing solutions; ground design in evidence.'},
+    {id:'s3', t:'State two strengths of low‑fidelity prototypes.', lines:[1,2], must:[["cheap","quick","fast"],["easy to change","iterat" ]], nice:[["explore many ideas"],["early feedback"]], model:'Cheap/fast and easy to change; support exploring many ideas and getting early feedback.'},
+    {id:'s4', t:'Differentiate horizontal vs vertical prototype (one phrase each).', lines:[1,2], must:[["breadth","wide"],["depth","end-to-end"]], nice:[["many features shallow"],["few features deep"]], model:'Horizontal = breadth across many features, shallow; Vertical = deep slice of a few tasks end‑to‑end.'},
+    {id:'s5', t:'Name two Nielsen heuristics relevant to error handling.', lines:[1,2], must:[["error prevention"],["help","documentation","help users"],["recover","undo","forgiveness","user control"]], nice:[["recognition over recall"]], model:'Error prevention; user control & freedom (undo/cancel); and help/documentation for recovery.'},
+    {id:'s6', t:'What does “design for error” imply?', lines:[1,2], must:[["prevent"],["recover","undo","graceful"]], nice:[["constraints","confirmation"]], model:'Prevent mistakes where possible and support graceful recovery (e.g., undo/confirmations).'},
+    {id:'s7', t:'Give one Gestalt law and its implication.', lines:[1,2], must:[["proximity","similarity","closure","continuity","common fate","figure"],["group","perceive","interpret"]], nice:[["enclosure","connected"]], model:'(e.g.) Proximity: close items are perceived as a group, shaping how users interpret relationships.'},
+    {id:'s8', t:'What does a cognitive walkthrough primarily assess?', lines:[1,2], must:[["learnability","novice"],["step","action","sequence"]], nice:[["intention","discoverability","feedback"]], model:'Learnability for a novice by stepping through actions and judging intention, discoverability, and feedback.'},
+  ];
+
+  const MINIS = [
+    {id:'m1', t:'Contrast empirical vs predictive evaluation with one example each.', lines:[3,5], must:[["empirical","users"],["predictive","expert","inspection"],["example"]], nice:[["think‑aloud","lab","field"],["heuristic evaluation","cognitive walkthrough"]], model:'Empirical uses real users (e.g., lab usability test with think‑aloud). Predictive uses expert inspection (e.g., heuristic evaluation or cognitive walkthrough) without users.'},
+    {id:'m2', t:'Explain the shift from low‑fi to high‑fi over a project and why.', lines:[3,5], must:[["early","explore","diverge"],["later","converge","feasibility"],["risk","cost","fidelity"]], nice:[["stakeholders"],["look/feel" ]], model:'Start low‑fi to explore many concepts cheaply. Increase fidelity later for realistic look/feel and feasibility checks, reducing risk before commit.'},
+    {id:'m3', t:'Outline DECIDE framework highlights you would prioritize for a class usability test.', lines:[3,5], must:[["determine","aims"],["choose","approach"],["practical issues","recruit","schedule"],["ethical","consent","privacy"],["evaluate","interpret","present"]], nice:[["questions"]], model:'Determine aims and questions; choose approaches; handle practical issues (recruit/sample/schedule); decide ethics (consent, privacy); evaluate, interpret, and present findings.'},
+    {id:'m4', t:'Describe how visibility, mapping, and feedback together reduce gulfs of execution/evaluation.', lines:[3,5], must:[["visibility"],["mapping"],["feedback"],["execution","evaluation"]], nice:[["signifiers"],["state"]], model:'Visibility and signifiers show available actions (execution). Good mapping links controls to effects. Immediate feedback exposes outcomes (evaluation), shrinking both gulfs.'},
+  ];
+
+  const SCENS = [
+    {id:'c1', t:'You are designing a kiosk for first‑time hospital visitors. In 4–6 lines, describe how you would combine needfinding and task analysis to scope V1.', lines:[4,6], must:[["stakeholder","patients","nurses","visitors"],["observe","interview","field","shadow"],["tasks","HTA","subtask","plan"],["pain points","bottleneck","error"],["requirements","scope","v1"]], nice:[["personas"],["environment","context"]], model:'Recruit visitors and staff; observe/short interviews in the lobby (context). Capture tasks and HTA (e.g., find clinic → print queue). Note pain points (jargon, maps). Translate into requirements for V1 scope.'},
+    {id:'c2', t:'A mobile payment flow has high drop‑off at confirmation. In 4–6 lines, propose changes grounded in heuristics and visual design.', lines:[4,6], must:[["error prevention","confirm"],["user control","undo","cancel"],["visibility","status"],["mapping","consistency"],["visual","hierarchy","contrast","whitespace"]], nice:[["recognition over recall"],["feedback"]], model:'Improve visibility of totals and items; simplify mapping and consistency of buttons. Add clear cancel/back (control) and staged confirmation. Use hierarchy/whitespace to highlight risk and add error‑preventing constraints (e.g., disabled until fields valid).'},
+  ];
+
+  // ---- Rendering ----
+  function renderGroup(hostId, bank){
+    const host = document.getElementById(hostId);
+    host.innerHTML = '';
+    bank.forEach((q,idx)=>{
+      const el = document.createElement('div');
+      el.className = 'q';
+      el.innerHTML = `
+        <h3>${q.t}</h3>
+        <div class="meta">Target length: ${q.lines[0]}–${q.lines[1]} lines</div>
+        <textarea id="${q.id}" placeholder="Type your answer…"></textarea>
+        <div class="row">
+          <button class="btn" data-check="${q.id}">Check</button>
+          <span class="pill" id="${q.id}_len">0 lines</span>
+          <span class="pill" id="${q.id}_must">Must‑have: 0/0</span>
+          <span class="pill" id="${q.id}_nice">Nice‑to‑have: 0/0</span>
+        </div>
+        <div class="explain hidden" id="${q.id}_exp"></div>
+      `;
+      host.appendChild(el);
+    });
+  }
+
+  renderGroup('shorts', SHORTS);
+  renderGroup('minis', MINIS);
+  renderGroup('scens', SCENS);
+
+  // ---- Scoring & events ----
+  let answered = 0, score = 0; // 1 point per question if all must‑haves + length OK
+
+  function updateStats(){
+    document.getElementById('answered').textContent = answered;
+    document.getElementById('score').textContent = score;
+  }
+
+  function attach(){
+    document.querySelectorAll('[data-check]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const id = btn.getAttribute('data-check');
+        const bank = [...SHORTS, ...MINIS, ...SCENS];
+        const q = bank.find(x=>x.id===id);
+        const ta = document.getElementById(id);
+        const txt = ta.value.trim();
+        const len = clampLines(ta, q.lines[0], q.lines[1]);
+        const kw = scoreKeywords(txt, q.must, q.nice);
+        // Update pills
+        const lenP = document.getElementById(id+'_len');
+        lenP.textContent = `${len.lines} line${len.lines===1?'':'s'}`;
+        lenP.className = 'pill ' + (len.ok?'good':'bad');
+        const mustP = document.getElementById(id+'_must');
+        mustP.textContent = `Must‑have: ${kw.mustCount}/${kw.mustTotal}`;
+        mustP.className = 'pill ' + (kw.mustCount===kw.mustTotal?'good':'bad');
+        const niceP = document.getElementById(id+'_nice');
+        niceP.textContent = `Nice‑to‑have: ${kw.niceCount}/${kw.niceTotal}`;
+        niceP.className = 'pill';
+        // Explanation
+        const exp = document.getElementById(id+'_exp');
+        exp.classList.remove('hidden');
+        exp.innerHTML = `<b>Model answer:</b> ${q.model}`;
+        // First time scoring per question
+        if(!btn.dataset.done){
+          answered++; if(len.ok && kw.mustCount===kw.mustTotal) score++;
+          btn.dataset.done = '1';
+          updateStats();
+        }
+      }, {once:false});
+    });
+  }
+
+  attach();
+
+  // ---- Header actions ----
+  document.getElementById('reset').addEventListener('click',()=>{ localStorage.removeItem('inf2002_meq2'); answered=0; score=0; renderGroup('shorts', SHORTS); renderGroup('minis', MINIS); renderGroup('scens', SCENS); attach(); updateStats(); window.scrollTo({top:0,behavior:'smooth'}); });
+  document.getElementById('save').addEventListener('click', saveState);
+  document.getElementById('load').addEventListener('click', ()=>{ loadState(); });
+  document.getElementById('reveal').addEventListener('click',()=>{
+    [...SHORTS, ...MINIS, ...SCENS].forEach(q=>{
+      const ta = document.getElementById(q.id);
+      const len = clampLines(ta, q.lines[0], q.lines[1]);
+      const kw = scoreKeywords(ta.value||'', q.must, q.nice);
+      document.getElementById(q.id+'_len').textContent = `${len.lines} line${len.lines===1?'':'s'}`;
+      document.getElementById(q.id+'_len').className = 'pill ' + (len.ok?'good':'bad');
+      document.getElementById(q.id+'_must').textContent = `Must‑have: ${kw.mustCount}/${kw.mustTotal}`;
+      document.getElementById(q.id+'_must').className = 'pill ' + (kw.mustCount===kw.mustTotal?'good':'bad');
+      document.getElementById(q.id+'_nice').textContent = `Nice‑to‑have: ${kw.niceCount}/${kw.niceTotal}`;
+      const exp = document.getElementById(q.id+'_exp'); exp.classList.remove('hidden'); exp.innerHTML = `<b>Model answer:</b> ${q.model}`;
+    });
+  });
+
+  // Init
+  updateStats();
+})();
+</script>
+</body>
+</html>
