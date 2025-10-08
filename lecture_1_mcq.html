@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INF2002 – Lecture 1 MCQ Test</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#94a3b8;--text:#e5e7eb;--brand:#2563eb;--ok:#10b981;--err:#ef4444;--card:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),#0c1426);border-bottom:1px solid #1f2937}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{margin:0 0 4px;font-size:22px}
+    .sub{color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{appearance:none;border:1px solid #2b3547;background:#111c30;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:white}
+    .stat{display:inline-flex;align-items:center;gap:6px;border:1px solid #2b3547;padding:6px 10px;border-radius:999px;color:var(--muted)}
+    .grid{display:grid;gap:14px}
+    .layout{grid-template-columns:1fr}
+    @media(min-width:980px){.layout{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid #1f2937;border-radius:14px;padding:14px}
+    .q{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px}
+    .q h3{margin:0 0 8px;font-size:15px}
+    .opt{display:flex;gap:8px;align-items:flex-start;padding:10px;border:1px solid #263347;border-radius:10px;background:#0b1220;cursor:pointer;color:#fff}
+    .opt:not(.disabled):hover{border-color:#33507a}
+    .opt.correct{border-color:#064e3b;background:#06251d}
+    .opt.wrong{border-color:#7f1d1d;background:#2f0a0a}
+    .explain{margin-top:8px;color:var(--muted)}
+    .badge{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2b3547;color:#c7d2fe}
+    .meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    footer{color:var(--muted);font-size:12px;padding:24px 16px}
+    .muted{color:var(--muted)}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+      <div>
+        <h1>INF2002 – Lecture 1 MCQ Test</h1>
+        <div class="sub">History of HCI • User‑Centered Design • Introduction • 20–30 MCQs • Instant feedback • Score tracking</div>
+      </div>
+      <div class="controls">
+        <span class="stat">Score: <b id="score">0</b>/<b id="total">0</b></span>
+        <span class="stat">Answered: <b id="answered">0</b></span>
+        <button class="btn" id="shuffle">Shuffle</button>
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn primary" id="reveal">Reveal All</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid layout">
+    <section class="card">
+      <div id="questions" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="muted">Sources: Lecture 1 slides & transcripts. For study only.</div>
+  </footer>
+
+<script>
+(function(){
+  // Helper to shuffle
+  function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+  // Question bank (≥24). Topics: History of HCI, UCD, Intro.
+  const BANK = [
+    {
+      t:"Which essay introduced the concept of the Memex, inspiring hypertext and the web?",
+      o:["Ted Nelson’s ‘Computer Lib’ (1974)","Vannevar Bush’s ‘As We May Think’ (1945)","Tim Berners‑Lee’s ‘Information Management: A Proposal’ (1989)","Douglas Engelbart’s ‘Mother of All Demos’ (1968)"],
+      a:1,
+      e:"Bush’s 1945 essay proposed the Memex, a precursor to modern hypertext and the Web.",
+      k:["memex","bush","as we may think","1945"]
+    },
+    {
+      t:"Who coined the term ‘hypertext’?",
+      o:["Tim Berners‑Lee","Ted Nelson","Alan Kay","Ivan Sutherland"],
+      a:1,
+      e:"Ted Nelson coined ‘hypertext’ and ‘hypermedia’; see Project Xanadu context.",
+      k:["hypertext","ted nelson"]
+    },
+    {
+      t:"ENIAC is notable because it was…",
+      o:["the first transistorized personal computer","the first general‑purpose, fully electronic digital computer","the first GUI workstation","the first commercial Internet router"],
+      a:1,
+      e:"ENIAC marked a major milestone as the first general‑purpose, fully electronic digital computer.",
+      k:["eniac","first general purpose","electronic"]
+    },
+    {
+      t:"Which lab pioneered early GUI concepts in the 1970s?",
+      o:["Bell Labs","MIT Media Lab","Xerox PARC","Stanford AI Lab"],
+      a:2,
+      e:"Xerox PARC developed key GUI ideas later commercialized in products like the Xerox Star and Macintosh.",
+      k:["gui","xerox parc"]
+    },
+    {
+      t:"Who invented the computer mouse in the 1960s?",
+      o:["Douglas Engelbart","Alan Kay","JCR Licklider","Mark Weiser"],
+      a:0,
+      e:"Engelbart’s team built early mouse prototypes; showcased in the 1968 NLS demo.",
+      k:["mouse","engelbart"]
+    },
+    {
+      t:"Which system first commercialized a full GUI with icons, windows, and folders?",
+      o:["Apple Lisa","Xerox Star (1981)","Amiga 1000","Windows 1.0"],
+      a:1,
+      e:"Xerox Star was the first commercial system with a modern GUI paradigm.",
+      k:["xerox star","1981"]
+    },
+    {
+      t:"‘Direct manipulation’ emphasizes…",
+      o:["command syntax memorization","batch scripts","immediate, reversible actions on visible objects","voice‑only interaction"],
+      a:2,
+      e:"Direct manipulation focuses on continuous visibility and rapid, reversible actions with immediate feedback.",
+      k:["direct manipulation","visibility","reversible"]
+    },
+    {
+      t:"Mark Weiser’s ‘Ubiquitous Computing’ envisions…",
+      o:["one desktop for every user","computing embedded everywhere, becoming ‘transparent’","VR headsets for all work","edge computing replacing the web"],
+      a:1,
+      e:"UbiComp embeds computation into the environment so it ‘disappears’ into everyday life.",
+      k:["ubiquitous","weiser","pervasive"]
+    },
+    {
+      t:"Milgram & Kishino’s RV continuum spans…",
+      o:["CLI → GUI","Real ↔ Virtual environments with AR/MR in between","2D ↔ 3D UIs","Text ↔ Voice UIs"],
+      a:1,
+      e:"The continuum ranges from real to virtual, with AR and MR between those extremes.",
+      k:["rv continuum","milgram","ar","mr","vr"]
+    },
+    {
+      t:"In UCD, which principle comes first?",
+      o:["Heuristic evaluation","Early focus on users and tasks","A/B testing on release","Pixel‑perfect visual design"],
+      a:1,
+      e:"UCD begins with an early focus on users and tasks via research and task definition.",
+      k:["early focus","users","tasks"]
+    },
+    {
+      t:"Which is NOT a core UCD principle?",
+      o:["Empirical measurement of use","Iterative design","Active user involvement","‘Ship first, fix later’"],
+      a:3,
+      e:"UCD relies on research, measurement, and iteration—not ‘ship‑and‑fix’.",
+      k:["ucd principles","iteration","measurement"]
+    },
+    {
+      t:"A persona is…",
+      o:["a real user you interviewed","a fictional archetype grounded in research","a stakeholder’s favorite user","an analytics dashboard"],
+      a:1,
+      e:"Personas are fictional but evidence‑based representations of key user segments.",
+      k:["persona","fictional","user segment"]
+    },
+    {
+      t:"Which activity fits the UCD ‘Concept’ phase?",
+      o:["Lo‑fi paper prototypes","Release survey","Heuristic evaluation of a built product","User interviews & task analysis"],
+      a:3,
+      e:"Concept phase builds understanding: interviews, field studies, task analysis, personas.",
+      k:["concept","interviews","task analysis"]
+    },
+    {
+      t:"Paper prototypes are primarily used to…",
+      o:["measure server latency","quickly test concepts before heavy build","finalize typography","collect telemetry at scale"],
+      a:1,
+      e:"Paper prototyping enables rapid, low‑cost iteration and early feedback before development.",
+      k:["paper prototype","low fidelity","iterate"]
+    },
+    {
+      t:"Which is the typical UCD loop?",
+      o:["Design → Build → Market → Support","Understand context → Specify requirements → Design solutions → Evaluate → Iterate","Code → Test → Deploy","Brainstorm → Pitch → Fund"],
+      a:1,
+      e:"Standard loop: understand users/context, specify requirements, design, evaluate, iterate.",
+      k:["context","requirements","design","evaluate","iterate"]
+    },
+    {
+      t:"Empirical measurement in UCD emphasizes…",
+      o:["opinions only","ease of learning & use, testing with real users","lab hardware tuning","post‑release sales only"],
+      a:1,
+      e:"Measure usability with users: learnability, efficiency, satisfaction, errors, etc.",
+      k:["empirical","testing","ease of use"]
+    },
+    {
+      t:"Which touchscreen tech became widely commercialized by the 1980s?",
+      o:["Capacitive touch only","Infrared and resistive systems","Ultrasonic pens","Force‑sensing glass"],
+      a:1,
+      e:"Early finger‑driven, IR, and resistive systems shipped broadly in the 1980s (e.g., HP‑150).",
+      k:["touchscreen","infrared","resistive","hp-150"]
+    },
+    {
+      t:"W.I.M.P stands for…",
+      o:["Windows, Icons, Menus, Pointing","Web, Icons, Media, Pointers","Windows, Inputs, Modes, Ports","Widgets, Inspectors, Menus, Panels"],
+      a:0,
+      e:"Classic desktop GUI paradigm: Windows, Icons, Menus, Pointing.",
+      k:["wimp","windows icons menus pointing"]
+    },
+    {
+      t:"Which stage typically includes heuristic evaluation and usability testing pre‑release?",
+      o:["Concept","Design","Develop","Release"],
+      a:2,
+      e:"The develop stage plans and executes pre‑release evaluations before formal release testing.",
+      k:["develop","heuristic","usability testing"]
+    },
+    {
+      t:"A key difference between CLI and GUI historically is that GUI…",
+      o:["requires more memorization","offers higher discoverability for novices","has no learning curve","uses fewer system resources"],
+      a:1,
+      e:"GUIs increased discoverability and reduced recall burden compared to command languages.",
+      k:["cli","gui","discoverability"]
+    },
+    {
+      t:"Which statement about iterative design is MOST accurate?",
+      o:["A one‑time validation before coding","Repeated cycles of design, test, and refinement","Cosmetic polish after launch","Only for visual designers"],
+      a:1,
+      e:"Iteration repeatedly tests and refines concepts early and often, not just at the end.",
+      k:["iterative","cycles","test","refine"]
+    },
+    {
+      t:"NLS (1968) is significant because it…",
+      o:["introduced cloud computing","demonstrated practical use of hypertext and the mouse","invented the transistor","was the first laptop"],
+      a:1,
+      e:"The ‘Mother of All Demos’ showed hypertext, mouse, windows, and collaborative editing.",
+      k:["nls","mother of all demos","hypertext","mouse"]
+    },
+    {
+      t:"Alan Kay’s Dynabook vision (1972) anticipated…",
+      o:["portable, personal computing for learning (tablet‑like)","mainframe batch jobs","serverless microservices","pure VR workspaces"],
+      a:0,
+      e:"Dynabook envisioned lightweight, portable personal computers for education—proto‑tablets.",
+      k:["dynabook","alan kay","portable"]
+    },
+    {
+      t:"Which belongs to ‘Release’ stage activities?",
+      o:["Contextual inquiry","Lo‑fi wireframes","Formal usability testing and feedback surveys","System architecture"],
+      a:2,
+      e:"Release often includes formal usability tests, post‑release surveys, and site visits.",
+      k:["release","formal usability","surveys","site visits"]
+    },
+    {
+      t:"In UCD, ‘allocation of function between users and technology’ refers to…",
+      o:["assigning team roles","deciding what the system automates vs. what the user does","partitioning code into modules","scheduling sprints"],
+      a:1,
+      e:"ISO‑style HCD emphasizes appropriate function allocation between human and system.",
+      k:["allocation of function","iso","hcd"]
+    },
+    {
+      t:"A good reason to build personas for a Singapore‑centric app is to…",
+      o:["avoid user research","replace usability testing","capture local context (e.g., HDB living, transit, language)","guarantee growth"],
+      a:2,
+      e:"Personas grounded in local context inform requirements and design trade‑offs.",
+      k:["persona","singapore","context"]
+    }
+  ];
+
+  // Render
+  const container = document.getElementById('questions');
+  let order = [...BANK.keys()];
+  let score=0, answered=0; const strict = document.getElementById('strict'); // may be null if strict UI removed
+
+  function render(){
+    document.getElementById('total').textContent = BANK.length;
+    container.innerHTML='';
+    order.forEach((idx,i)=>{
+      const q = BANK[idx];
+      const el = document.createElement('div');
+      el.className='q';
+      el.innerHTML = `
+        <h3>${i+1}. ${q.t}</h3>
+        <div class="opts"></div>
+        <div class="explain hidden"></div>
+      `;
+      const opts = el.querySelector('.opts');
+      const explain = el.querySelector('.explain');
+      q.o.forEach((text,oi)=>{
+        const o = document.createElement('button');
+        o.className='opt';
+        o.innerHTML = `<span class="badge">${String.fromCharCode(65+oi)}</span> <div>${text}</div>`;
+        o.addEventListener('click',()=>{
+          if(o.classList.contains('disabled')) return;
+          // lock all options for this question
+          [...opts.children].forEach(c=>{c.classList.add('disabled'); c.style.cursor='default'});
+          const correct = oi===q.a;
+          if(correct){ o.classList.add('correct'); score++; }
+          else{ o.classList.add('wrong'); [...opts.children][q.a].classList.add('correct'); }
+          answered++;
+          explain.classList.remove('hidden');
+          explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+          updateStats();
+        }, {once: (strict && strict.checked)});
+        opts.appendChild(o);
+      });
+      container.appendChild(el);
+    });
+    updateStats();
+  }
+
+  function updateStats(){
+    document.getElementById('score').textContent = score;
+    document.getElementById('answered').textContent = answered;
+  }
+
+  function reset(){ score=0; answered=0; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  document.getElementById('shuffle').addEventListener('click',()=>{ order = shuffleArray(order); reset(); });
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('reveal').addEventListener('click',()=>{
+    // reveal all explanations and mark correct options
+    document.querySelectorAll('.q').forEach((qEl,qi)=>{
+      const idx = order[qi]; const q = BANK[idx];
+      const opts = qEl.querySelectorAll('.opt');
+      opts.forEach((o,oi)=>{ o.classList.add('disabled'); if(oi===q.a) o.classList.add('correct'); });
+      const explain = qEl.querySelector('.explain');
+      explain.classList.remove('hidden');
+      explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+    });
+  });
+
+  // Init
+  render();
+})();
+</script>
+</body>
+</html>

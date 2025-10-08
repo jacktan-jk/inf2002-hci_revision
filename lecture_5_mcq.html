@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INF2002 – Lecture 5 MCQ Test</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#94a3b8;--text:#e5e7eb;--brand:#2563eb;--ok:#10b981;--err:#ef4444;--card:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),#0c1426);border-bottom:1px solid #1f2937}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{margin:0 0 4px;font-size:22px}
+    .sub{color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{appearance:none;border:1px solid #2b3547;background:#111c30;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:white}
+    .stat{display:inline-flex;align-items:center;gap:6px;border:1px solid #2b3547;padding:6px 10px;border-radius:999px;color:var(--muted)}
+    .grid{display:grid;gap:14px}
+    .layout{grid-template-columns:1fr}
+    @media(min-width:980px){.layout{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid #1f2937;border-radius:14px;padding:14px}
+    .q{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px}
+    .q h3{margin:0 0 8px;font-size:15px}
+    .opt{display:flex;gap:8px;align-items:flex-start;padding:10px;border:1px solid #263347;border-radius:10px;background:#0b1220;cursor:pointer;color:#fff}
+    .opt:not(.disabled):hover{border-color:#33507a}
+    .opt.correct{border-color:#064e3b;background:#06251d}
+    .opt.wrong{border-color:#7f1d1d;background:#2f0a0a}
+    .explain{margin-top:8px;color:var(--muted)}
+    .badge{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2b3547;color:#c7d2fe}
+    footer{color:var(--muted);font-size:12px;padding:24px 16px}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+      <div>
+        <h1>INF2002 – Lecture 5 MCQ Test</h1>
+        <div class="sub">Empirical Evaluation • Usability Heuristics • Predictive Evaluation • 30 MCQs • Instant feedback • Score tracking</div>
+      </div>
+      <div class="controls">
+        <span class="stat">Score: <b id="score">0</b>/<b id="total">0</b></span>
+        <span class="stat">Answered: <b id="answered">0</b></span>
+        <button class="btn" id="shuffle">Shuffle</button>
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn primary" id="reveal">Reveal All</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid layout">
+    <section class="card">
+      <div id="questions" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="muted">Sources: Lecture 5 slides & transcripts (Empirical Evaluation, Heuristics, Predictive Evaluation). For study only.</div>
+  </footer>
+
+<script>
+(function(){
+  function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+  // ===== Question Bank (30) =====
+  const BANK = [
+    // Empirical vs Predictive
+    {t:"Empirical evaluation is defined as…",
+     o:["experts inspecting a UI without users","assessing a system through observation and data from real users","deriving measures from formal models only","automatic telemetry only"],
+     a:1,
+     e:"Empirical = direct observation/data from actual users (lab/field/usability tests)."},
+    {t:"Predictive evaluation is…",
+     o:["running A/B tests","experts evaluating a UI via heuristics/walkthroughs without users","machine‑generated QA","purely statistical modeling"],
+     a:1,
+     e:"Predictive uses experts and ‘thought experiments’ (e.g., heuristic evaluation, cognitive walkthrough)."},
+
+    // Formative vs Summative
+    {t:"Formative evaluation typically occurs…",
+     o:["after release only","early and throughout to improve the design iteratively","never with users","only in the field"],
+     a:1,
+     e:"Formative = early/continuous, to improve the design as it forms."},
+    {t:"Summative evaluation aims to…",
+     o:["shape design hypotheses","judge the finished system’s effectiveness/satisfaction","recruit participants","write code"],
+     a:1,
+     e:"Summative assesses outcomes of a completed system (e.g., success rates, satisfaction)."},
+
+    // Methods
+    {t:"Which is NOT an empirical method?",
+     o:["Think‑aloud with target users","Lab study","Heuristic evaluation","Field study"],
+     a:2,
+     e:"Heuristic evaluation is predictive/inspection, not empirical."},
+    {t:"Think‑aloud protocol guidance includes…",
+     o:["assist users to finish tasks","do not help; prompt with neutral questions; record and analyze later","avoid recording","only count clicks"],
+     a:1,
+     e:"Evaluator prompts neutrally, does not help users solve tasks; data is recorded for analysis."},
+    {t:"A lab study’s main advantage is…",
+     o:["ecological validity","replicability due to controlled setting","no need for users","cheapness"],
+     a:1,
+     e:"Controlled lab enables replication/causal inference; field is more ecologically valid."},
+    {t:"A field study’s main drawback is…",
+     o:["requires a lab","often not reproducible and can be user‑specific","only quantitative","always slower"],
+     a:1,
+     e:"Field contexts vary, so results are harder to reproduce and may be user/context‑specific."},
+
+    // Tasks & measures
+    {t:"Good task sheets should include…",
+     o:["internal code structure","task description with inputs/expected outputs","marketing copy only","PII collection instructions"],
+     a:1,
+     e:"Users get task descriptions; evaluators plan measures (time, errors, success)."},
+    {t:"Which is a reasonable usability metric?",
+     o:["lines of code","time on task, errors, success rate","CPU clock speed","board meetings"],
+     a:1,
+     e:"Common metrics: time, errors, success, number of info‑sheet referrals, etc."},
+
+    // Heuristics – definitions
+    {t:"Nielsen’s set contains which item?",
+     o:["Dark mode required","Visibility of system status","3D animations","AI copilots"],
+     a:1,
+     e:"One of the 10: visibility of system status (plus real‑world match, control/freedom, etc.)."},
+    {t:"‘Recognition over recall’ means…",
+     o:["prefer codes over icons","make options visible/recognizable to lower memory load","hide advanced options","use memorization drills"],
+     a:1,
+     e:"Prefer visible options/icons/previews to reduce recall demands."},
+    {t:"‘User control & freedom’ implies…",
+     o:["no undo","clear exits and reversible actions","one fixed path only","hide back navigation"],
+     a:1,
+     e:"Provide undo/cancel/escape and multiple ways to do tasks."},
+    {t:"‘Error prevention’ example is…",
+     o:["ambiguous error after submission","restrict input to valid formats and confirm destructive actions","only log errors","use red backgrounds"],
+     a:1,
+     e:"Constrain inputs, confirmations, defaults—prevent before recover."},
+    {t:"‘Aesthetic & minimalist design’ focuses on…",
+     o:["maximal information density","clean UI; remove irrelevant/duplicate info","brightest colors","3D skeuomorphism"],
+     a:1,
+     e:"Reduce clutter; keep only what supports the task."},
+    {t:"‘Help’ heuristic suggests…",
+     o:["hide docs","task‑focused, searchable, concrete steps and clarifications","legal ToS only","marketing pages"],
+     a:1,
+     e:"Provide actionable, searchable help tied to user tasks."},
+
+    // Heuristic evaluation mechanics
+    {t:"Heuristic evaluation typically uses…",
+     o:["1 evaluator for 8 hours","3–5 evaluators independently, then aggregate","only product managers","live A/B traffic"],
+     a:1,
+     e:"Multiple independent evaluators find more/different problems; later aggregate."},
+    {t:"Single evaluator typically finds about…",
+     o:[">90% of problems","≈35% of problems","0% of problems","100% of problems"],
+     a:1,
+     e:"Rule of thumb: one finds ~35%; five find ~75% of issues."},
+    {t:"Severity rating combines…",
+     o:["pixel color and font","frequency, impact, and persistence","brand fit and ROI","CPU and memory"],
+     a:1,
+     e:"Severity = how common, how harmful, how often users must overcome it."},
+    {t:"A good severity 4 (‘catastrophe’) example is…",
+     o:["minor copy inconsistency","data loss on back button","typo in help","slightly slow animation"],
+     a:1,
+     e:"Catastrophic: data loss, blocked tasks, security/privacy violations, etc."},
+
+    // Cognitive Walkthrough
+    {t:"Cognitive walkthrough mainly assesses…",
+     o:["visual branding","learnability by stepping through tasks from a novice perspective","hardware reliability","legal compliance"],
+     a:1,
+     e:"Evaluators simulate a user’s action sequence, asking four questions at each step."},
+    {t:"Which is NOT one of the 4 CW questions?",
+     o:["Will user be trying to produce the effect?","Will user notice the action is available?","Will system pass unit tests?","Will user understand the feedback?"],
+     a:2,
+     e:"The four focus on intention, discoverability, selection, and feedback—not unit tests."},
+    {t:"CW requirements include…",
+     o:["full production backend","user/task descriptions and list of actions; prototype or mockups","legal NDA only","random A/B"],
+     a:1,
+     e:"Need users’ background, task description, complete action list, and UI to walk through."},
+
+    // DECIDE Framework
+    {t:"In DECIDE, the ‘D’ at the start stands for…",
+     o:["Deploy","Determine aims and goals","Design code","Decompose UI"],
+     a:1,
+     e:"DECIDE: Determine aims; Explore questions; Choose approach; Identify practical issues; Decide ethical issues; Evaluate/interpret/present."},
+    {t:"Which belongs under ‘Decide on ethical issues’?",
+     o:["pick color palette","develop informed consent; participants’ right to withdraw/privacy","GPU tuning","logo design"],
+     a:1,
+     e:"Ethics: consent, rights, privacy, ability to leave, polite treatment, approvals (IRB)."},
+    {t:"A practical issues checklist item is…",
+     o:["choose server region","select users, how to contact, how many; stay on budget/schedule","pick font pairing","update OKRs"],
+     a:1,
+     e:"Recruiting, logistics, budget/schedule, equipment, evaluators."},
+
+    // Shneiderman’s 8 Golden Rules (recap)
+    {t:"Which is one of Shneiderman’s rules?",
+     o:["randomize menus each visit","provide informative feedback and dialog closure","limit undo to admins only","prefer recall over recognition"],
+     a:1,
+     e:"Eight rules include consistency, shortcuts, feedback, dialog closure, simple error handling, reversible actions, user control, reduce memory load."},
+
+    // Applications
+    {t:"Best way to reduce the ‘gulf of evaluation’ is to…",
+     o:["hide system state","provide immediate, informative feedback and clear status","require memorized codes","force modal dialogs"],
+     a:1,
+     e:"Feedback/status make outcomes interpretable."},
+    {t:"A heuristic violation example: inconsistent terminology across pages maps to…",
+     o:["error prevention","consistency and standards","aesthetic & minimalist","help"],
+     a:1,
+     e:"Using ‘Save’ in one place and ‘Write file’ in another violates consistency."},
+    {t:"In a usability test plan, choosing success metrics belongs under…",
+     o:["branding","measures to be made during the task (e.g., time, errors, success)","recruiting scripts","visual design"],
+     a:1,
+     e:"Define what you’ll measure and how before running sessions."},
+    {t:"Which pairing is correct?",
+     o:["Empirical—experts only; Predictive—actual users","Empirical—actual users; Predictive—experts/heuristics","Both require only telemetry","Neither informs design"],
+     a:1,
+     e:"Core contrast emphasized in lecture."},
+    {t:"When reporting heuristic findings, you should…",
+     o:["merge all problems into one point","list each issue separately with the violated heuristic and severity","omit severity","skip debrief"],
+     a:1,
+     e:"Tie each finding to a heuristic, include severity, and debrief with the team."},
+  ];
+
+  // ===== Render =====
+  const container = document.getElementById('questions');
+  let order = [...BANK.keys()];
+  let score=0, answered=0;
+
+  function render(){
+    document.getElementById('total').textContent = BANK.length;
+    container.innerHTML='';
+    order.forEach((idx,i)=>{
+      const q = BANK[idx];
+      const el = document.createElement('div');
+      el.className='q';
+      el.innerHTML = `
+        <h3>${i+1}. ${q.t}</h3>
+        <div class=\"opts\"></div>
+        <div class=\"explain hidden\"></div>
+      `;
+      const opts = el.querySelector('.opts');
+      const explain = el.querySelector('.explain');
+      q.o.forEach((text,oi)=>{
+        const o = document.createElement('button');
+        o.className='opt';
+        o.innerHTML = `<span class=\"badge\">${String.fromCharCode(65+oi)}</span> <div>${text}</div>`;
+        o.addEventListener('click',()=>{
+          if(o.classList.contains('disabled')) return;
+          [...opts.children].forEach(c=>{c.classList.add('disabled'); c.style.cursor='default'});
+          const correct = oi===q.a;
+          if(correct){ o.classList.add('correct'); score++; }
+          else{ o.classList.add('wrong'); [...opts.children][q.a].classList.add('correct'); }
+          answered++;
+          explain.classList.remove('hidden');
+          explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+          updateStats();
+        }, {once: true});
+        opts.appendChild(o);
+      });
+      container.appendChild(el);
+    });
+    updateStats();
+  }
+
+  function updateStats(){
+    document.getElementById('score').textContent = score;
+    document.getElementById('answered').textContent = answered;
+  }
+
+  function reset(){ score=0; answered=0; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  document.getElementById('shuffle').addEventListener('click',()=>{ order = shuffleArray(order); reset(); });
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('reveal').addEventListener('click',()=>{
+    document.querySelectorAll('.q').forEach((qEl,qi)=>{
+      const idx = order[qi]; const q = BANK[idx];
+      const opts = qEl.querySelectorAll('.opt');
+      opts.forEach((o,oi)=>{ o.classList.add('disabled'); if(oi===q.a) o.classList.add('correct'); });
+      const explain = qEl.querySelector('.explain');
+      explain.classList.remove('hidden');
+      explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INF2002 – Lecture 3 MCQ Test</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#94a3b8;--text:#e5e7eb;--brand:#2563eb;--ok:#10b981;--err:#ef4444;--card:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),#0c1426);border-bottom:1px solid #1f2937}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{margin:0 0 4px;font-size:22px}
+    .sub{color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{appearance:none;border:1px solid #2b3547;background:#111c30;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:white}
+    .stat{display:inline-flex;align-items:center;gap:6px;border:1px solid #2b3547;padding:6px 10px;border-radius:999px;color:var(--muted)}
+    .grid{display:grid;gap:14px}
+    .layout{grid-template-columns:1fr}
+    @media(min-width:980px){.layout{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid #1f2937;border-radius:14px;padding:14px}
+    .q{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px}
+    .q h3{margin:0 0 8px;font-size:15px}
+    .opt{display:flex;gap:8px;align-items:flex-start;padding:10px;border:1px solid #263347;border-radius:10px;background:#0b1220;cursor:pointer;color:#fff}
+    .opt:not(.disabled):hover{border-color:#33507a}
+    .opt.correct{border-color:#064e3b;background:#06251d}
+    .opt.wrong{border-color:#7f1d1d;background:#2f0a0a}
+    .explain{margin-top:8px;color:var(--muted)}
+    .badge{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2b3547;color:#c7d2fe}
+    footer{color:var(--muted);font-size:12px;padding:24px 16px}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+      <div>
+        <h1>INF2002 – Lecture 3 MCQ Test</h1>
+        <div class="sub">Usability Principles (Parts 1 & 2) • Ethics • 30 MCQs • Instant feedback • Score tracking</div>
+      </div>
+      <div class="controls">
+        <span class="stat">Score: <b id="score">0</b>/<b id="total">0</b></span>
+        <span class="stat">Answered: <b id="answered">0</b></span>
+        <button class="btn" id="shuffle">Shuffle</button>
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn primary" id="reveal">Reveal All</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid layout">
+    <section class="card">
+      <div id="questions" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="muted">Sources: Lecture 3 slides & transcripts (Usability Principles P1/P2, Ethics). For study only.</div>
+  </footer>
+
+<script>
+(function(){
+  function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+  // ===== Question Bank (30) =====
+  const BANK = [
+    // Usability (Part 1)
+    {t:"ISO 9241-11 defines usability in terms of…",
+     o:["beauty and novelty","effectiveness, efficiency, and satisfaction in a specified context of use","download speed and uptime","pixel density and color gamut"],
+     a:1,
+     e:"ISO 9241-11: effectiveness, efficiency, satisfaction for specified users, goals, and context.",},
+    {t:"Affordance refers to…",
+     o:["the legal right to use content","perceived/actual properties that suggest possible actions","how users feel after a task","aesthetic minimalism"],
+     a:1,
+     e:"Affordances suggest what actions are possible (e.g., handles afford pulling).",},
+    {t:"A ‘signifier’ is…",
+     o:["the physical capability itself","a cue indicating how to use an object","a KPI","a design sprint artifact"],
+     a:1,
+     e:"Signifiers are perceivable cues that indicate what to do (e.g., labels, icons).",},
+    {t:"Visibility helps by…",
+     o:["hiding advanced features","making available actions obvious without manuals","increasing saturation only","replacing feedback"],
+     a:1,
+     e:"Visibility makes actions and system state apparent, reducing cognitive load.",},
+    {t:"Which best describes ‘mapping’?",
+     o:["data encryption scheme","relationship between controls and their effects","UI color palette","URL routing"],
+     a:1,
+     e:"Good mapping makes control→result relationships intuitive (e.g., stove knobs).",},
+    {t:"‘Constraints’ in UI design can be…",
+     o:["only physical","only cultural","physical, semantic, cultural, or logical","irrelevant to error prevention"],
+     a:2,
+     e:"Constraints narrow actions to prevent error (e.g., disabling past dates).",},
+    {t:"Which is a false affordance?",
+     o:["a button that looks clickable but isn’t","a disabled control shown greyed‑out","a tooltip","a modal dialog"],
+     a:0,
+     e:"False affordance: appearance suggests an action that isn’t actually possible.",},
+    {t:"Metaphors in UI (e.g., desktop, folders) are used to…",
+     o:["avoid documentation","transfer familiar relationships from one domain to another","impress stakeholders","improve GPU usage"],
+     a:1,
+     e:"Metaphors leverage prior knowledge to improve learnability.",},
+
+    // Usability (Part 2)
+    {t:"Conceptual vs mental model: which is accurate?",
+     o:["Both are identical","Conceptual: designer’s structured explanation; Mental: user’s internal, often incomplete model","Conceptual: user’s guess; Mental: the spec","Both are just UI color schemes"],
+     a:1,
+     e:"Designer’s conceptual model → conveyed via system image → user forms mental model.",},
+    {t:"The ‘gulf of execution’ asks…",
+     o:["How do I know what happened?","How do I know what I can do?","How fast is the system?","How many users clicked?"],
+     a:1,
+     e:"Execution: effort to determine and perform actions; Evaluation: interpret what happened.",},
+    {t:"Which principle directly reduces the gulf of evaluation?",
+     o:["Fancy gradients","Immediate, informative feedback","Extra menus","Dark mode"],
+     a:1,
+     e:"Feedback clarifies outcomes, helping users interpret system state.",},
+    {t:"Norman’s 7 includes all EXCEPT…",
+     o:["Use knowledge in the world and in the head","Get the mappings right","Exploit constraints","Delight with animations"],
+     a:3,
+     e:"Norman’s list: knowledge, simplify tasks, visibility, mapping, constraints, design for error, standardize.",},
+    {t:"Nielsen’s heuristics include…",
+     o:["A/B testing","Match between system and real world; user control; consistency; error prevention; help","Only typography rules","Color accessibility only"],
+     a:1,
+     e:"Set includes status visibility, real‑world match, control/freedom, consistency, error prevention, recognition, flexibility, minimalist design, help/docs.",},
+    {t:"Example of good mapping:",
+     o:["four stove knobs arranged in a line controlling a 2×2 burner layout","four stove knobs arranged in a 2×2 layout matching burners","a single knob marked ‘Heat’","hidden touch areas"],
+     a:1,
+     e:"Layout that mirrors effect improves mapping and reduces errors.",},
+    {t:"Design for error implies…",
+     o:["assume perfect users","prevent mistakes and support graceful recovery (e.g., undo)","hide all options","ignore constraints"],
+     a:1,
+     e:"Prevent errors where possible; provide clear recovery when they occur (undo, confirmations).",},
+    {t:"Which change most improves visibility in a complex toolbar?",
+     o:["remove labels from all icons","group by task with clear labels and active‑state highlighting","reduce contrast","hide half the tools"],
+     a:1,
+     e:"Group/label and highlight state so users can see what actions are available/active.",},
+
+    // Ethics
+    {t:"Ethics in HCI is needed because…",
+     o:["no human participants are involved","HCI examines behavior and often collects personal data","it speeds up rendering","it replaces QA"],
+     a:1,
+     e:"HCI studies people and their data; ethics protects participants and guides decisions.",},
+    {t:"Golden Rule means…",
+     o:["maximize revenue","do unto others as you would have them do unto you","never change the UI","only test with employees"],
+     a:1,
+     e:"Treat participants as you’d want to be treated; foundational ethical lens.",},
+    {t:"Categorical Imperative (Kant) implies…",
+     o:["if an action isn’t right for everyone, it isn’t right for anyone","ends justify means","the user is always wrong","privacy is optional"],
+     a:0,
+     e:"Universalizability test for ethical action.",},
+    {t:"Descartes’ Rule of Change emphasizes…",
+     o:["repeat actions without limit","if an action cannot be taken repeatedly, it may not be right","never run experiments","always use deception"],
+     a:1,
+     e:"Looks at consequences of repeated actions over time.",},
+    {t:"Utilitarian Principle suggests…",
+     o:["choose the action with greatest collective benefit","avoid all data collection","always favor experts","never change requirements"],
+     a:0,
+     e:"Maximize overall well‑being (e.g., accessible design choices).",},
+    {t:"Risk Aversion Principle suggests…",
+     o:["prefer least harm/potential cost","maximize clicks","ignore edge cases","collect extra PII for later"],
+     a:0,
+     e:"Design confirmations; choose safer options to reduce potential harm.",},
+    {t:"Ethical ‘No Free Lunch’ rule implies…",
+     o:["all data is public","assume things are owned unless stated otherwise","training on user uploads is always fine","licenses are optional"],
+     a:1,
+     e:"Don’t use user content (e.g., for AI) without explicit consent/terms.",},
+    {t:"Belmont Report principles are…",
+     o:["security, scalability, speed","respect for persons, beneficence, justice","HIPAA, GDPR, PDPA","truth, beauty, goodness"],
+     a:1,
+     e:"Respect (incl. consent, protect vulnerable), Beneficence (minimize harm), Justice (fair distribution).",},
+    {t:"General ethical responsibilities include…",
+     o:["maximize KPIs","minimize harm, informed consent, protect privacy, follow codes/laws","never debrief","share all raw data"],
+     a:1,
+     e:"Core responsibilities in any HCI study.",},
+    {t:"IRB exists to…",
+     o:["speed up hiring","review and protect human subjects research","approve budgets","enforce UI style guides"],
+     a:1,
+     e:"Institutional Review Boards review studies involving human participants.",},
+    {t:"Under Singapore law, PDPA focuses on…",
+     o:["food safety","personal data protection obligations","export controls","copyright only"],
+     a:1,
+     e:"PDPA governs handling of personal data in Singapore.",},
+    {t:"HBRA (Human Biomedical Research Act) applies to…",
+     o:["software licenses","human biomedical research in Singapore","internet speed tests","door signage"],
+     a:1,
+     e:"HBRA regulates human biomedical research; know scope even if HCI may be outside it.",},
+    {t:"Which past failure highlighted consent/privacy risks?",
+     o:["UNIX epoch","Facebook–Cambridge Analytica","IPv6","Moore’s law"],
+     a:1,
+     e:"Personal data harvested without consent; widely cited ethics case.",},
+    {t:"An algorithmic bias case discussed in class:",
+     o:["PNG compression","Google Photos mislabeling Black people","B‑tree indexing","TCP slow start"],
+     a:1,
+     e:"Mislabeling revealed harms from biased training/validation.",},
+    {t:"A risky design encouraging dangerous behavior:",
+     o:["Snapchat speed filter","progress bar","undo","graceful error"],
+     a:0,
+     e:"Speed filter incentivized sharing while driving; ethics of harm.",},
+    {t:"Good privacy practice in studies:",
+     o:["collect everything just in case","destroy/anon data when no longer needed and use only for consented purposes","publish emails in appendix","skip consent if low risk"],
+     a:1,
+     e:"Collect minimum, secure it, restrict use to stated purposes, de‑identify/retire when done.",},
+    {t:"Informed consent must include…",
+     o:["UI color codes","goals, procedures, what data recorded, how results used, voluntariness","server IPs","exam answers"],
+     a:1,
+     e:"Tell participants what will happen, what’s recorded, and how it’s used; participation is voluntary.",},
+  ];
+
+  // ===== Render =====
+  const container = document.getElementById('questions');
+  let order = [...BANK.keys()];
+  let score=0, answered=0;
+
+  function render(){
+    document.getElementById('total').textContent = BANK.length;
+    container.innerHTML='';
+    order.forEach((idx,i)=>{
+      const q = BANK[idx];
+      const el = document.createElement('div');
+      el.className='q';
+      el.innerHTML = `
+        <h3>${i+1}. ${q.t}</h3>
+        <div class="opts"></div>
+        <div class="explain hidden"></div>
+      `;
+      const opts = el.querySelector('.opts');
+      const explain = el.querySelector('.explain');
+      q.o.forEach((text,oi)=>{
+        const o = document.createElement('button');
+        o.className='opt';
+        o.innerHTML = `<span class="badge">${String.fromCharCode(65+oi)}</span> <div>${text}</div>`;
+        o.addEventListener('click',()=>{
+          if(o.classList.contains('disabled')) return;
+          [...opts.children].forEach(c=>{c.classList.add('disabled'); c.style.cursor='default'});
+          const correct = oi===q.a;
+          if(correct){ o.classList.add('correct'); score++; }
+          else{ o.classList.add('wrong'); [...opts.children][q.a].classList.add('correct'); }
+          answered++;
+          explain.classList.remove('hidden');
+          explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+          updateStats();
+        }, {once: true});
+        opts.appendChild(o);
+      });
+      container.appendChild(el);
+    });
+    updateStats();
+  }
+
+  function updateStats(){
+    document.getElementById('score').textContent = score;
+    document.getElementById('answered').textContent = answered;
+  }
+
+  function reset(){ score=0; answered=0; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  document.getElementById('shuffle').addEventListener('click',()=>{ order = shuffleArray(order); reset(); });
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('reveal').addEventListener('click',()=>{
+    document.querySelectorAll('.q').forEach((qEl,qi)=>{
+      const idx = order[qi]; const q = BANK[idx];
+      const opts = qEl.querySelectorAll('.opt');
+      opts.forEach((o,oi)=>{ o.classList.add('disabled'); if(oi===q.a) o.classList.add('correct'); });
+      const explain = qEl.querySelector('.explain');
+      explain.classList.remove('hidden');
+      explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INF2002 – Lecture 4 MCQ Test</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#94a3b8;--text:#e5e7eb;--brand:#2563eb;--ok:#10b981;--err:#ef4444;--card:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),#0c1426);border-bottom:1px solid #1f2937}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{margin:0 0 4px;font-size:22px}
+    .sub{color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{appearance:none;border:1px solid #2b3547;background:#111c30;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:white}
+    .stat{display:inline-flex;align-items:center;gap:6px;border:1px solid #2b3547;padding:6px 10px;border-radius:999px;color:var(--muted)}
+    .grid{display:grid;gap:14px}
+    .layout{grid-template-columns:1fr}
+    @media(min-width:980px){.layout{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid #1f2937;border-radius:14px;padding:14px}
+    .q{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px}
+    .q h3{margin:0 0 8px;font-size:15px}
+    .opt{display:flex;gap:8px;align-items:flex-start;padding:10px;border:1px solid #263347;border-radius:10px;background:#0b1220;cursor:pointer;color:#fff}
+    .opt:not(.disabled):hover{border-color:#33507a}
+    .opt.correct{border-color:#064e3b;background:#06251d}
+    .opt.wrong{border-color:#7f1d1d;background:#2f0a0a}
+    .explain{margin-top:8px;color:var(--muted)}
+    .badge{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2b3547;color:#c7d2fe}
+    footer{color:var(--muted);font-size:12px;padding:24px 16px}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+      <div>
+        <h1>INF2002 – Lecture 4 MCQ Test</h1>
+        <div class="sub">Prototyping (Parts 1 & 2): Storyboards • Low/Hi‑Fi • Horizontal/Vertical • Video • Wizard‑of‑Oz • 28 MCQs</div>
+      </div>
+      <div class="controls">
+        <span class="stat">Score: <b id="score">0</b>/<b id="total">0</b></span>
+        <span class="stat">Answered: <b id="answered">0</b></span>
+        <button class="btn" id="shuffle">Shuffle</button>
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn primary" id="reveal">Reveal All</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid layout">
+    <section class="card">
+      <div id="questions" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="muted">Sources: Lecture 4 slides & transcripts (Prototyping P1/P2). For study only.</div>
+  </footer>
+
+<script>
+(function(){
+  function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+  // ===== Question Bank (28) =====
+  const BANK = [
+    // Prototyping fundamentals
+    {t:"A prototype is primarily…",
+     o:["a final product","a rapid approximation of a design used to gather feedback","a marketing mockup","a requirements contract"],
+     a:1,
+     e:"Definition from lecture: visualize/simulate/evaluate how users might interact; fast feedback early.",},
+    {t:"Main reasons to prototype include all EXCEPT…",
+     o:["clarify vague requirements","sell ideas & inspire innovation","test feasibility","guarantee no bugs in final product"],
+     a:3,
+     e:"Prototypes reduce risk and aid communication—but do not guarantee a bug‑free final build.",},
+    {t:"Rights of a prototype include…",
+     o:["must be complete","easy to change and allowed to retire","must ship to users","must be pixel‑perfect"],
+     a:1,
+     e:"Slides: should not be required to be complete; should be easy to change; gets to retire.",},
+
+    // Storyboards & scenarios
+    {t:"Storyboards are…",
+     o:["production UI specs","sequence of sketches showing user progression through a task","legal contracts","A/B test plans"],
+     a:1,
+     e:"Series of scene sketches to communicate how a task unfolds; often paired with scenarios.",},
+    {t:"A good storyboard should convey ALL of the following EXCEPT…",
+     o:["setting (people, environment, task)","sequence (steps and triggers)","satisfaction (motivation/outcome)","database schema"],
+     a:3,
+     e:"Key triad: setting, sequence, satisfaction—DB schema isn’t part of storyboard content.",},
+    {t:"Scenarios are…",
+     o:["always real events","hypothetical situations of use providing context","UI color palettes","unit tests"],
+     a:1,
+     e:"Scenarios are hypothetical/future situations that frame use and context.",},
+
+    // Fidelity
+    {t:"Low‑fidelity prototypes are typically…",
+     o:["expensive, code‑heavy","cheap, quick, using media unlike final product (paper/cardboard)","identical to final","back‑end only"],
+     a:1,
+     e:"Low‑fi: quick, cheap, flexible; focus on conceptual design; use paper, cardboard, etc.",},
+    {t:"High‑fidelity prototypes…",
+     o:["avoid looking like the final product","closely resemble final product and may use similar parts","never include code","replace testing"],
+     a:1,
+     e:"Hi‑fi simulate look/feel and sometimes partial functionality; used later for feasibility/usability.",},
+    {t:"A risk of hi‑fi prototypes is…",
+     o:["easy iteration","users may confuse demo with finished product and set high expectations","no communication value","cannot be tested"],
+     a:1,
+     e:"Slides note boundary confusion, performance issues, and pressure to recycle hacked code.",},
+
+    // Transition & evaluation
+    {t:"How should fidelity change over time?",
+     o:["start hi‑fi, then go low‑fi","shift from low‑fi to hi‑fi as project progresses","stay low‑fi only","jump straight to production"],
+     a:1,
+     e:"Start broad/cheap for exploration, increase fidelity as certainty grows.",},
+    {t:"Testing prototypes with people should…",
+     o:["use one prototype only","avoid think‑aloud","include multiple users and variants; encourage conversation","wait until release"],
+     a:2,
+     e:"Test multiple options with multiple users early; think‑aloud/retrospective are common.",},
+
+    // Wireframes
+    {t:"Wireframes are…",
+     o:["skeletal layouts to arrange elements for a purpose","final pixel designs","database migrations","a/b results"],
+     a:0,
+     e:"Page schematics that guide layout and information structure before visual polish.",},
+
+    // Horizontal vs Vertical
+    {t:"Horizontal prototype emphasizes…",
+     o:["wide coverage with little depth","one function in full depth","database integrity","GPU profiling"],
+     a:0,
+     e:"Horizontal = breadth across many features; Vertical = deep slice of a few.",},
+    {t:"Vertical prototype is best when…",
+     o:["you need breadth for demos","you must validate a few flows end‑to‑end with realistic depth","you’re doing color studies","you want to show menus only"],
+     a:1,
+     e:"Verticals validate deep functionality/technical feasibility for specific tasks.",},
+
+    // Video prototyping
+    {t:"Video prototyping is mainly used to…",
+     o:["stress test servers","illustrate how users interact via story‑like narrative shots","replace all usability tests","comply with PDPA"],
+     a:1,
+     e:"A storytelling/communication tool—establishing shots, task flow, success.",},
+    {t:"A benefit of video prototyping is…",
+     o:["requires full code","cheap, portable, self‑explanatory way to convey concepts","avoids tying designs to tasks","prevents scope definition"],
+     a:1,
+     e:"Cheap/fast; ties interface to tasks; helps scope MVP; useful for stakeholders.",},
+
+    // Wizard of Oz
+    {t:"Wizard‑of‑Oz prototyping…",
+     o:["hides all humans","simulates system behavior with a human operating behind the scenes","requires full ML models","is only for games"],
+     a:1,
+     e:"User believes system is autonomous; human ‘wizard’ drives responses through hooks.",},
+    {t:"A core rule for Wizard‑of‑Oz is that it must be…",
+     o:["slower and harder than real build","faster/cheaper/easier than building full system early","done post‑release","limited to voice UIs"],
+     a:1,
+     e:"Use WoZ early to explore requirements before heavy engineering.",},
+    {t:"Typical WoZ roles include…",
+     o:["product owner and CFO","facilitator and hidden wizard","designer and DBA","QA lead and SRE"],
+     a:1,
+     e:"Facilitator provides tasks/takes notes; wizard operates interface remotely/hidden.",},
+    {t:"When preparing a WoZ prototype, you should…",
+     o:["skip rehearsal","map scenarios and add hooks where wizard will provide inputs","avoid skeleton UIs","hide evaluation"],
+     a:1,
+     e:"Plan scenarios/flows; create UI skeletons; add hooks (e.g., choose next screen, enter text).",},
+    {t:"A disadvantage of WoZ is…",
+     o:["cannot explore future tech","may misrepresent immature tech; wizard fatigue/inconsistency","requires no training","bans debriefing"],
+     a:1,
+     e:"Slides: may simulate tech that doesn’t exist; wizards need training; exhausting; venue limits.",},
+
+    // Applications & decisions
+    {t:"Choose LOW‑fi when…",
+     o:["validating fine motion/transitions of a micro‑interaction","exploring many divergent concepts quickly","finalizing pixel‑perfect UI","running performance benchmarks"],
+     a:1,
+     e:"Early exploration and fast iteration are low‑fi’s strengths.",},
+    {t:"Choose HI‑fi when…",
+     o:["selling stakeholders a clear look/feel and testing feasibility of key interactions","brainstorming wild alternatives","mapping domain objects","recruiting participants"],
+     a:0,
+     e:"Hi‑fi is best for look/feel realism and validating technical feasibility later.",},
+    {t:"Horizontal vs Vertical: which pairing is correct?",
+     o:["Horizontal = credit card auth in depth; Vertical = many shallow features","Horizontal = many features shallow; Vertical = few features deep","Both are depth‑only","Both are breadth‑only"],
+     a:1,
+     e:"Direct from slide diagram contrasting e‑commerce subsystems.",},
+
+    // Misconceptions & pitfalls
+    {t:"Which is a common pitfall of hi‑fi prototypes noted in class?",
+     o:["stakeholders under‑estimate progress","pressure to recycle hacked prototype code into production","too easy to change","they never crash"],
+     a:1,
+     e:"‘Invisible compromises’ and pressure to ship demo code were highlighted as risks.",},
+    {t:"Testing guidance from lecture suggests you should…",
+     o:["test only once at the end","iterate with users early and often; adjust based on feedback","avoid multiple variants","skip debrief"],
+     a:1,
+     e:"Emphasis on iterative testing with users and debriefing.",},
+
+    // Tooling
+    {t:"Which is listed as a common hi‑fi software prototyping tool?",
+     o:["Wireshark","Axure / Justinmind (and similar)","tmux","ffmpeg"],
+     a:1,
+     e:"Slides name Justinmind and Axure among others.",},
+    {t:"Wireframes best support…",
+     o:["database partitioning","arranging elements to accomplish a purpose before visual polish","final color palettes","log retention policy"],
+     a:1,
+     e:"Purpose‑first layout decisions precede visual details.",},
+
+    // Integration
+    {t:"What do prototypes prototype? (Houde & Hill)",
+     o:["Only visuals","Feel, Implementation, and Role","Only role","Only code"],
+     a:1,
+     e:"Three axes used to clarify what the prototype investigates.",},
+    {t:"A storyboard is LEAST useful for…",
+     o:["aligning stakeholders on task flow","communicating setting/sequence/satisfaction","GPU driver benchmarking","eliciting early feedback"],
+     a:2,
+     e:"Storyboards communicate flows, not low‑level performance metrics.",},
+  ];
+
+  // ===== Render =====
+  const container = document.getElementById('questions');
+  let order = [...BANK.keys()];
+  let score=0, answered=0;
+
+  function render(){
+    document.getElementById('total').textContent = BANK.length;
+    container.innerHTML='';
+    order.forEach((idx,i)=>{
+      const q = BANK[idx];
+      const el = document.createElement('div');
+      el.className='q';
+      el.innerHTML = `
+        <h3>${i+1}. ${q.t}</h3>
+        <div class="opts"></div>
+        <div class="explain hidden"></div>
+      `;
+      const opts = el.querySelector('.opts');
+      const explain = el.querySelector('.explain');
+      q.o.forEach((text,oi)=>{
+        const o = document.createElement('button');
+        o.className='opt';
+        o.innerHTML = `<span class="badge">${String.fromCharCode(65+oi)}</span> <div>${text}</div>`;
+        o.addEventListener('click',()=>{
+          if(o.classList.contains('disabled')) return;
+          [...opts.children].forEach(c=>{c.classList.add('disabled'); c.style.cursor='default'});
+          const correct = oi===q.a;
+          if(correct){ o.classList.add('correct'); score++; }
+          else{ o.classList.add('wrong'); [...opts.children][q.a].classList.add('correct'); }
+          answered++;
+          explain.classList.remove('hidden');
+          explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+          updateStats();
+        }, {once: true});
+        opts.appendChild(o);
+      });
+      container.appendChild(el);
+    });
+    updateStats();
+  }
+
+  function updateStats(){
+    document.getElementById('score').textContent = score;
+    document.getElementById('answered').textContent = answered;
+  }
+
+  function reset(){ score=0; answered=0; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  document.getElementById('shuffle').addEventListener('click',()=>{ order = shuffleArray(order); reset(); });
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('reveal').addEventListener('click',()=>{
+    document.querySelectorAll('.q').forEach((qEl,qi)=>{
+      const idx = order[qi]; const q = BANK[idx];
+      const opts = qEl.querySelectorAll('.opt');
+      opts.forEach((o,oi)=>{ o.classList.add('disabled'); if(oi===q.a) o.classList.add('correct'); });
+      const explain = qEl.querySelector('.explain');
+      explain.classList.remove('hidden');
+      explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CSC2101 – Short-Answer & Mini‑Essay Quiz</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#94a3b8;--text:#e5e7eb;--brand:#2563eb;--ok:#10b981;--warn:#f59e0b;--err:#ef4444;--card:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),#0c1426);border-bottom:1px solid #1f2937}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{margin:0 0 4px;font-size:22px}
+    .sub{color:var(--muted);font-size:13px}
+    .grid{display:grid;gap:14px}
+    .layout{grid-template-columns:1fr}
+    @media(min-width:980px){.layout{grid-template-columns:280px 1fr}}
+    .card{background:var(--panel);border:1px solid #1f2937;border-radius:14px;padding:14px}
+    .q{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px}
+    .q h3{margin:0 0 8px;font-size:15px}
+    .q small{color:var(--muted)}
+    textarea,input[type="text"]{width:100%;background:#0b1220;border:1px solid #243041;color:var(--text);border-radius:10px;padding:10px;min-height:44px}
+    textarea{min-height:110px;resize:vertical}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{appearance:none;border:1px solid #2b3547;background:#111c30;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:white}
+    .btn.ghost{background:transparent}
+    .k{display:inline-block;background:#0c1a33;border:1px solid #1f2a40;color:#93c5fd;padding:2px 8px;border-radius:999px;font-size:12px}
+    .score{font-weight:600}
+    .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px}
+    .pill.ok{background:#052e22;color:#a7f3d0;border:1px solid #064e3b}
+    .pill.warn{background:#2a1e05;color:#fde68a;border:1px solid #a16207}
+    .pill.err{background:#2f0a0a;color:#fecaca;border:1px solid #7f1d1d}
+    details{border-top:1px dashed #213047;margin-top:10px;padding-top:10px}
+    footer{color:var(--muted);font-size:12px;padding:24px 16px}
+    .monos{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+    .muted{color:var(--muted)}
+    .tbar{display:flex;gap:10px;align-items:center;justify-content:space-between}
+    .timer{font:600 18px/1 monospace;color:#c7d2fe}
+    .badge{border:1px solid #2b3547;padding:2px 6px;border-radius:8px;color:var(--muted)}
+    .section h2{margin:0 0 6px;font-size:16px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap tbar">
+      <div>
+        <h1>CSC2101 – Short-Answer & Mini‑Essay Quiz</h1>
+        <div class="sub">45 min • Closed book • Written short answers & mini‑essays • Auto‑grading by keywords</div>
+      </div>
+      <div class="row">
+        <span class="badge">Total: <span id="totalPoints" class="monos">0</span> pts</span>
+        <span class="timer" id="timer">45:00</span>
+        <button class="btn" id="startTimer">Start</button>
+        <button class="btn ghost" id="pauseTimer">Pause</button>
+        <button class="btn ghost" id="resetTimer">Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid layout">
+    <!-- Sidebar -->
+    <aside class="card" id="sidebar">
+      <div class="section">
+        <h2>Sections</h2>
+        <ul class="muted" style="margin:0;padding-left:16px">
+          <li><a href="#short">8 × Short (1 pt)</a></li>
+          <li><a href="#mini">4 × Mini‑essay (3 pts)</a></li>
+          <li><a href="#scn">2 × Scenario (4 pts)</a></li>
+        </ul>
+      </div>
+      <div class="section" style="margin-top:10px">
+        <h2>Controls</h2>
+        <div class="row" style="margin-top:6px">
+          <button class="btn primary" id="gradeBtn">Grade</button>
+          <button class="btn" id="saveBtn">Save</button>
+          <button class="btn ghost" id="loadBtn">Load</button>
+          <button class="btn ghost" id="clearBtn">Clear</button>
+        </div>
+        <small class="muted">Saves locally (browser). No server.</small>
+      </div>
+      <div class="section" style="margin-top:10px">
+        <h2>Rubric (auto)</h2>
+        <ul class="muted" style="margin:0;padding-left:16px">
+          <li>Short: ≥2 keywords → 1 pt (1 keyword → 0.5)</li>
+          <li>Mini‑essay: keywords + application + metric → 3 pts</li>
+          <li>Scenario: concept + context + intervention + metric → 4 pts</li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <section class="grid" style="gap:16px">
+
+      <div class="card" id="short">
+        <h2>Short Answers (8 × 1 pt)</h2>
+        <div class="grid">
+
+          <!-- Q1 History vs. GUI/CLI -->
+          <div class="q" data-type="short" data-points="1" data-keywords='["discover","discoverability","learn","learnability","efficiency","power","gui","command","cli"]'>
+            <h3>1) Contrast command‑line vs GUI: one benefit & one drawback of each.</h3>
+            <input type="text" placeholder="1–2 lines" />
+            <small class="muted">Keywords: discoverability, learnability, efficiency, power, GUI/CLI.</small>
+            <div class="result"></div>
+          </div>
+
+          <!-- Q2 UCD loop -->
+          <div class="q" data-type="short" data-points="1" data-keywords='["understand context","context of use","requirements","design","evaluate","iterate"]'>
+            <h3>2) List the core UCD loop in order.</h3>
+            <input type="text" placeholder="1–2 lines (→ arrows optional)" />
+            <small class="muted">Keywords: understand context → requirements → design → evaluate → iterate.</small>
+            <div class="result"></div>
+          </div>
+
+          <!-- Q3 Requirements types -->
+          <div class="q" data-type="short" data-points="1" data-keywords='["functional","ux","non-functional","time on task","error rate","latency","throughput"]'>
+            <h3>3) Functional vs UX requirement — give one example each.</h3>
+            <input type="text" placeholder="e.g., must upload PDF; time‑on‑task &lt; 60s" />
+            <small class="muted">Keywords: functional / UX, time‑on‑task, error rate.</small>
+            <div class="result"></div>
+          </div>
+
+          <!-- Q4 Needfinding methods -->
+          <div class="q" data-type="short" data-points="1" data-keywords='["interview","observation","diary","survey","breadth","depth","longitudinal","ecological","bias"]'>
+            <h3>4) Pick two needfinding methods and when to use each.</h3>
+            <input type="text" placeholder="1–2 lines" />
+            <small class="muted">Keywords: interviews/observations/diaries/surveys; breadth vs depth; longitudinal.</small>
+            <div class="result"></div>
+          </div>
+
+          <!-- Q5 Error prevention vs recovery -->
+          <div class="q" data-type="short" data-points="1" data-keywords='["prevent","prevention","recover","recovery","constraints","defaults","undo","inline validation"]'>
+            <h3>5) Give 1 example of error prevention and 1 of error recovery in forms.</h3>
+            <input type="text" placeholder="1–2 lines" />
+            <small class="muted">Keywords: constraints, defaults, undo, inline validation.</small>
+            <div class="result"></div>
+          </div>
+
+          <!-- Q6 Learnability vs efficiency -->
+          <div class="q" data-type="short" data-points="1" data-keywords='["learnability","time to first success","ttfs","efficiency","keystroke","time on task"]'>
+            <h3>6) Define learnability vs efficiency; propose one metric for each.</h3>
+            <input type="text" placeholder="1–2 lines" />
+            <small class="muted">Keywords: TTFS, time‑on‑task, keystrokes.</small>
+            <div class="result"></div>
+          </div>
+
+          <!-- Q7 Visual design tactics -->
+          <div class="q" data-type="short" data-points="1" data-keywords='["hierarchy","headings","chunk","chunking","bullet","whitespace","spacing","contrast"]'>
+            <h3>7) Improve scannability of a dense page — list 3 tactics.</h3>
+            <input type="text" placeholder="1–2 lines" />
+            <small class="muted">Keywords: hierarchy, chunking, headings, whitespace, contrast.</small>
+            <div class="result"></div>
+          </div>
+
+          <!-- Q8 Ethics dark patterns -->
+          <div class="q" data-type="short" data-points="1" data-keywords='["dark pattern","forced continuity","nagging","obfuscation","consent"]'>
+            <h3>8) What is a “dark pattern”? Name one to avoid in an LMS.</h3>
+            <input type="text" placeholder="1–2 lines" />
+            <small class="muted">Keywords: forced continuity, nagging, obfuscation, consent.</small>
+            <div class="result"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="card" id="mini">
+        <h2>Mini‑Essays (4 × 3 pts)</h2>
+        <div class="grid">
+
+          <!-- Q9 1980s editor vs IDE change -->
+          <div class="q" data-type="essay" data-points="3" data-keywords='["wysiwyg","undo","affordance","feedback","direct manipulation"]' data-apply='["novice","onboarding","discover","learn","visibility"]' data-metric='["time","error","rate","%","seconds","minutes","satisfaction","sus","score"]'>
+            <h3>9) 1980s text editor vs modern IDE — pick one HCI change that most improved novice adoption. Explain.</h3>
+            <textarea placeholder="3–5 lines"></textarea>
+            <small class="muted">Look for concept → application → metric/impact.</small>
+            <div class="result"></div>
+          </div>
+
+          <!-- Q10 Persuade stakeholder to do UCD -->
+          <div class="q" data-type="essay" data-points="3" data-keywords='["ucd","user-centered","risk","roi","rework","alignment","evidence"]' data-apply='["requirements","prototype","stakeholder","research","iterate"]' data-metric='["cost","time","defect","churn","cycle","lead","rework","%"]'>
+            <h3>10) Stakeholder wants features first. In ~4 lines, persuade them to do UCD first.</h3>
+            <textarea placeholder="3–5 lines"></textarea>
+            <small class="muted">Mention risk/ROI and concrete effects.</small>
+            <div class="result"></div>
+          </div>
+
+          <!-- Q11 Risks of jumping to hi-fi -->
+          <div class="q" data-type="essay" data-points="3" data-keywords='["high-fidelity","hi-fi","sunk cost","premature fixation","feedback bias","expectation"]' data-apply='["prototype","wireframe","stakeholder","usability"]' data-metric='["time","cost","speed","cycle","%","rework"]'>
+            <h3>11) Name two risks of jumping to high‑fidelity too early and why they matter.</h3>
+            <textarea placeholder="3–5 lines"></textarea>
+            <div class="result"></div>
+          </div>
+
+          <!-- Q12 Time↓ vs Sat not↑ interpretation -->
+          <div class="q" data-type="essay" data-points="3" data-keywords='["speed","clarity","trade-off","expectation","trust","learnability"]' data-apply='["usability test","think-aloud","heuristic","feedback"]' data-metric='["time on task","satisfaction","sus","nps","error","rate"]'>
+            <h3>12) Time‑on‑task fell but satisfaction didn’t rise. Interpret.</h3>
+            <textarea placeholder="3–5 lines"></textarea>
+            <div class="result"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="card" id="scn">
+        <h2>Scenarios (2 × 4 pts)</h2>
+        <div class="grid">
+
+          <!-- Q13 Missed submit button -->
+          <div class="q" data-type="scenario" data-points="4" data-keywords='["visual hierarchy","affordance","button","placement","scroll"]' data-context='["lms","assignment","submit","student","mobile","desktop"]' data-intervention='["redesign","sticky","footer","cta","contrast","size","icon","ab","a/b","prototype","tree test","card sort","usability test"]' data-metric='["success","rate","time","scroll depth","click-through","%","errors"]'>
+            <h3>13) Users miss the “Submit” button. Give 2 hypotheses and 1 quick test.</h3>
+            <textarea placeholder="4–6 lines"></textarea>
+            <small class="muted">Include an intervention and a measurable outcome.</small>
+            <div class="result"></div>
+          </div>
+
+          <!-- Q14 Start Quiz on mobile -->
+          <div class="q" data-type="scenario" data-points="4" data-keywords='["mobile","above the fold","touch target","contrast","placement"]' data-context='["quiz","start","nav","cta","visibility"]' data-intervention='["sticky","primary button","layout","hierarchy","icon","label","ab","a/b","prototype"]' data-metric='["tap","rate","conversion","time","%","errors"]'>
+            <h3>14) Students miss “Start Quiz” on mobile. Propose 3 changes and how you would validate.</h3>
+            <textarea placeholder="4–6 lines"></textarea>
+            <div class="result"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <div>
+            <button class="btn primary" id="gradeBtn2">Grade</button>
+            <button class="btn" id="exportBtn">Export JSON</button>
+          </div>
+          <div>
+            <span class="pill ok" id="scorePill">Score: 0</span>
+            <span class="pill warn" id="progressPill">Answered: 0/14</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="muted">Tip: Use concrete metrics (e.g., success rate %, time‑on‑task) and tie them to design changes.</div>
+  </footer>
+
+<script>
+(function(){
+  const $ = (sel, el=document) => el.querySelector(sel);
+  const $$ = (sel, el=document) => Array.from(el.querySelectorAll(sel));
+
+  // Timer
+  let remaining = 45*60; let t=null; const timerEl = $('#timer');
+  const fmt = s=>{const m=Math.floor(s/60).toString().padStart(2,'0');const ss=(s%60).toString().padStart(2,'0');return `${m}:${ss}`};
+  function tick(){ if(remaining<=0){ clearInterval(t); t=null; timerEl.textContent='00:00'; grade(); alert('Time up. Auto‑graded.'); return;} remaining--; timerEl.textContent=fmt(remaining); }
+  $('#startTimer').addEventListener('click',()=>{ if(!t){ t=setInterval(tick,1000);} });
+  $('#pauseTimer').addEventListener('click',()=>{ if(t){ clearInterval(t); t=null; }});
+  $('#resetTimer').addEventListener('click',()=>{ if(confirm('Reset timer to 45:00?')){ remaining=45*60; timerEl.textContent=fmt(remaining);} });
+
+  // Utility: normalize text
+  const norm = s => (s||'').toLowerCase().replace(/[^a-z0-9%\s\-]/g,' ').replace(/\s+/g,' ').trim();
+  const containsAny = (text, arr) => (arr||[]).some(k=> text.includes(k));
+  const countMatches = (text, arr) => (arr||[]).reduce((n,k)=> n + (text.includes(k)?1:0), 0);
+
+  function scoreShort(text, kw, pts){
+    const m = countMatches(text, kw);
+    if(m>=2) return pts;
+    if(m===1) return Math.max(0.5, Math.min(pts, 0.5));
+    return 0;
+  }
+
+  function scoreEssay(text, kw, apply, metric, pts){
+    let s = 0;
+    if(countMatches(text, kw)>=2) s+=1;
+    if(containsAny(text, apply)) s+=1;
+    if(containsAny(text, metric)) s+=1;
+    return Math.min(pts, s);
+  }
+
+  function scoreScenario(text, kw, ctx, iv, metric, pts){
+    let s = 0;
+    if(containsAny(text, kw)) s+=1;
+    if(containsAny(text, ctx)) s+=1;
+    if(containsAny(text, iv)) s+=1;
+    if(containsAny(text, metric)) s+=1;
+    return Math.min(pts, s);
+  }
+
+  function grade(){
+    const cards = $$('.q');
+    let total=0, got=0, answered=0;
+    cards.forEach(card=>{
+      const type = card.dataset.type;
+      const pts = Number(card.dataset.points||1);
+      total += pts;
+      const inp = card.querySelector('textarea, input');
+      const text = norm(inp.value);
+      if(text.length>0) answered++;
+      const kw = JSON.parse(card.dataset.keywords||'[]');
+      let sc=0;
+      if(type==='short') sc = scoreShort(text, kw, pts);
+      else if(type==='essay') sc = scoreEssay(text, kw, JSON.parse(card.dataset.apply||'[]'), JSON.parse(card.dataset.metric||'[]'), pts);
+      else if(type==='scenario') sc = scoreScenario(text, kw, JSON.parse(card.dataset.context||'[]'), JSON.parse(card.dataset.intervention||'[]'), JSON.parse(card.dataset.metric||'[]'), pts);
+      got += sc;
+      const r = card.querySelector('.result');
+      const pct = (sc/pts);
+      let pillClass = pct>=0.99? 'ok' : (pct>=0.5? 'warn' : 'err');
+      r.innerHTML = `<span class="pill ${pillClass}">+${sc.toFixed(2)} / ${pts}</span>`;
+    });
+    $('#scorePill').textContent = `Score: ${got.toFixed(2)} / ${total}`;
+    $('#progressPill').textContent = `Answered: ${answered}/14`;
+    $('#totalPoints').textContent = total;
+    return {score:got,total,answered};
+  }
+
+  // Save/Load/Clear
+  function save(){
+    const data = $$('.q').map(card=>{
+      const inp = card.querySelector('textarea, input');
+      return inp.value;
+    });
+    localStorage.setItem('csc2101_shortquiz_v1', JSON.stringify({ts:Date.now(), remaining, data}));
+    alert('Saved locally.');
+  }
+  function load(){
+    const raw = localStorage.getItem('csc2101_shortquiz_v1');
+    if(!raw){ alert('No saved data'); return; }
+    const {remaining:rem,data} = JSON.parse(raw);
+    if(Number.isFinite(rem)){ remaining = rem; $('#timer').textContent = fmt(remaining); }
+    if(Array.isArray(data)){
+      const cards = $$('.q');
+      data.forEach((v,i)=>{ if(cards[i]){ const inp = cards[i].querySelector('textarea, input'); inp.value = v; }});
+    }
+    grade();
+  }
+  function clearAll(){ if(confirm('Clear all answers?')){ $$('.q').forEach(c=>{ const inp=c.querySelector('textarea,input'); inp.value=''; c.querySelector('.result').textContent=''; }); grade(); }}
+
+  $('#gradeBtn').addEventListener('click', grade);
+  $('#gradeBtn2').addEventListener('click', grade);
+  $('#saveBtn').addEventListener('click', save);
+  $('#loadBtn').addEventListener('click', load);
+  $('#clearBtn').addEventListener('click', clearAll);
+
+  // Export JSON
+  $('#exportBtn').addEventListener('click', ()=>{
+    const result = grade();
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      timerRemainingSec: remaining,
+      answers: $$('.q').map((card,idx)=>({
+        index: idx+1,
+        type: card.dataset.type,
+        points: Number(card.dataset.points||1),
+        prompt: card.querySelector('h3').textContent.trim(),
+        answer: card.querySelector('textarea, input').value
+      })),
+      score: result.score,
+      total: result.total
+    };
+    const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'csc2101_shortquiz_export.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  // Init totals
+  grade();
+})();
+</script>
+</body>
+</html>

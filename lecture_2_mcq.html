@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INF2002 – Lecture 2 MCQ Test</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#94a3b8;--text:#e5e7eb;--brand:#2563eb;--ok:#10b981;--err:#ef4444;--card:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),#0c1426);border-bottom:1px solid #1f2937}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{margin:0 0 4px;font-size:22px}
+    .sub{color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{appearance:none;border:1px solid #2b3547;background:#111c30;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:white}
+    .stat{display:inline-flex;align-items:center;gap:6px;border:1px solid #2b3547;padding:6px 10px;border-radius:999px;color:var(--muted)}
+    .grid{display:grid;gap:14px}
+    .layout{grid-template-columns:1fr}
+    @media(min-width:980px){.layout{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid #1f2937;border-radius:14px;padding:14px}
+    .q{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px}
+    .q h3{margin:0 0 8px;font-size:15px}
+    .opt{display:flex;gap:8px;align-items:flex-start;padding:10px;border:1px solid #263347;border-radius:10px;background:#0b1220;cursor:pointer;color:#fff}
+    .opt:not(.disabled):hover{border-color:#33507a}
+    .opt.correct{border-color:#064e3b;background:#06251d}
+    .opt.wrong{border-color:#7f1d1d;background:#2f0a0a}
+    .explain{margin-top:8px;color:var(--muted)}
+    .badge{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2b3547;color:#c7d2fe}
+    footer{color:var(--muted);font-size:12px;padding:24px 16px}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+      <div>
+        <h1>INF2002 – Lecture 2 MCQ Test</h1>
+        <div class="sub">Needfinding • Task Analysis (HTA, TDH) • 28 MCQs • Instant feedback • Score tracking</div>
+      </div>
+      <div class="controls">
+        <span class="stat">Score: <b id="score">0</b>/<b id="total">0</b></span>
+        <span class="stat">Answered: <b id="answered">0</b></span>
+        <button class="btn" id="shuffle">Shuffle</button>
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn primary" id="reveal">Reveal All</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid layout">
+    <section class="card">
+      <div id="questions" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="muted">Sources: Lecture 2 slides & transcripts (Needfinding, Task Analysis). For study only.</div>
+  </footer>
+
+<script>
+(function(){
+  function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+  // ===== Question Bank (28) =====
+  const BANK = [
+    // Needfinding – concepts & purpose
+    {t:"Primary goal of needfinding is to…",
+     o:["decide UI colors","uncover real user problems, goals, and motivations before solutions","write test cases","optimize server latency"],
+     a:1,
+     e:"Needfinding surfaces true user needs (often tacit) to guide design before picking solutions.",
+    },
+    {t:"Which question belongs in the designer’s ‘Ask Yourself’ list?",
+     o:["How many sprints remain?","What do people do now in the target context?","What is the quarterly budget?","Which library version to ship?"],
+     a:1,
+     e:"Lecture frames needfinding with prompts such as ‘What do people do now?’ and context/ecology.",
+    },
+    {t:"Why is needfinding done before building?",
+     o:["To lock scope permanently","To justify stakeholder opinions","To guide innovation with evidence about users","To skip later evaluation"],
+     a:2,
+     e:"It informs design directions using user data, not assumptions.",
+    },
+
+    // Data gathering methods
+    {t:"Direct observation is characterized by…",
+     o:["watching users in real time (lab or field)","reading logs after the fact","purely remote surveys","focus groups only"],
+     a:0,
+     e:"Direct = observe behavior as it happens, in controlled lab or natural field settings.",
+    },
+    {t:"Hawthorne effect means participants may…",
+     o:["behave the same as usual","alter behavior because they know they’re observed","refuse consent","always give truthful answers"],
+     a:1,
+     e:"Knowing they’re observed can change behavior—an important risk to manage.",
+    },
+    {t:"Indirect observation includes…",
+     o:["live shadowing","screen/video review and system logs","ethnographic immersion only","lab A/B tests"],
+     a:1,
+     e:"Indirect = analyze recordings or traces instead of watching in real time.",
+    },
+    {t:"Ethnography emphasizes…",
+     o:["short remote polls","immersive, contextual study of people in their environment","hardware benchmarking","code reviews"],
+     a:1,
+     e:"Ethnography studies behavior in social context, often via extended immersion.",
+    },
+    {t:"A survey is best for…",
+     o:["deep, generative 1:1 narratives","large‑N structured data (plus some open‑ended)","measuring CPU usage","running usability lab tasks"],
+     a:1,
+     e:"Surveys/questionnaires gather broad, structured responses; may include some open text.",
+    },
+    {t:"Likert scales measure…",
+     o:["frequency only","binary correctness","attitudes on an agree↔disagree continuum","exact time‑on‑task"],
+     a:2,
+     e:"Likert captures attitudinal agreement levels (e.g., Strongly disagree ↔ Strongly agree).",
+    },
+    {t:"A focus group is…",
+     o:["a usability test with one user","a group interview (≈3–10) moderated to collect opinions","a diary study","server log analysis"],
+     a:1,
+     e:"Focus groups collect perceptions from multiple participants in a moderated session.",
+    },
+    {t:"Good survey practice includes…",
+     o:["very long questionnaires","fewer but better questions; clear motivation; anonymity","leading questions to get buy‑in","publishing raw PII"],
+     a:1,
+     e:"Tips include brevity, clarity, anonymity, and starting from research goals.",
+    },
+
+    // Interviews
+    {t:"Semi‑structured interviews…",
+     o:["have no guide at all","use a script but allow probing deviations","are identical to surveys","cannot reveal tacit needs"],
+     a:1,
+     e:"Semi‑structured blends a guide with flexibility to explore.",
+    },
+    {t:"An effective interview question example is…",
+     o:["Do you like our app?","Why do you perform task X, and what happens after you do it?","Rate from 1–5 your happiness","Please sign this NDA"],
+     a:1,
+     e:"Ask about tasks, why, dependencies, and consequences to uncover needs.",
+    },
+
+    // Task Analysis – definitions & aims
+    {t:"Task analysis studies…",
+     o:["desired future features only","how people actually perform jobs to achieve goals","pure system logs without context","internal cognitive states only"],
+     a:1,
+     e:"It analyzes current tasks, artifacts, knowledge, environment, and workflows.",
+    },
+    {t:"Declarative vs. procedural knowledge differ as…",
+     o:["how vs. why","objects/relationships vs. sequences/goals/subgoals","rules vs. exceptions","theory vs. practice"],
+     a:1,
+     e:"Declarative = what/objects; Procedural = how/sequence with dependencies and constraints.",
+    },
+    {t:"A key purpose of task analysis is to determine…",
+     o:["what users do, use, and must know","only visual design tokens","pricing strategy","CI/CD schedule"],
+     a:0,
+     e:"Slides state: determine actions, artifacts, and knowledge required for the task.",
+    },
+
+    // HTA
+    {t:"HTA (Hierarchical Task Analysis) primarily…",
+     o:["models database entities","splits a high‑level task into ordered subtasks with plans","estimates server capacity","designs UI color palettes"],
+     a:1,
+     e:"HTA decomposes tasks and documents ordering via Plans (e.g., Plan 0: do 1→2→3).",
+    },
+    {t:"In a textual HTA, ‘Plans’ specify…",
+     o:["team rota","ordering/conditions among subtasks","HTTP routes","file formats"],
+     a:1,
+     e:"Plans indicate sequence/conditions (e.g., do 1,2,3,5; when dust bag full, do 4).",
+    },
+    {t:"A stopping rule in HTA is to…",
+     o:["decompose until atomic neural actions","stop at the lowest sensible level relevant to goals","always stop after three levels","never stop until pixel actions"],
+     a:1,
+     e:"Decompose only as far as useful—often down to relevant motor actions.",
+    },
+    {t:"Which is a valid HTA example topic from class?",
+     o:["Compiling Linux kernel","Cleaning the home with attachments and dust bag plan","Quantum annealing","GPU shader graph"],
+     a:1,
+     e:"Slides use "+"cleaning home"+" and booking a doctor’s appointment to illustrate HTA.",
+    },
+
+    // Knowledge‑based analysis & TDH
+    {t:"Knowledge‑based analysis focuses on…",
+     o:["object/action taxonomies and required knowledge","pixel spacing rules","SQL joins","CDN caching"],
+     a:0,
+     e:"It captures objects used and actions performed; useful for manuals/training.",
+    },
+    {t:"In a TDH taxonomy, XOR means an object…",
+     o:["must be in all listed branches","can be in any number of branches","is in exactly one branch","is optional and external"],
+     a:2,
+     e:"TDH: XOR = exactly one; AND = must be in both; OR = one, many, or none.",
+    },
+    {t:"For wash/wipe in car controls, the branch type is AND because…",
+     o:["function is optional","position is optional","object must have both a function and a position","neither function nor position is needed"],
+     a:2,
+     e:"Example shows AND at the top, with function (wipers/washer) and position (front/rear).",
+    },
+
+    // Gathering & representing data
+    {t:"Which pipeline matches task analysis guidance?",
+     o:["Brainstorm → build → ship","Collect actions/objects → organize tasks/subtasks → diagram/notation","Code → perf test → deploy","Sketch → color → icon"],
+     a:1,
+     e:"Slides recommend collecting raw lists, organizing hierarchies, then representing (text/diagram).",
+    },
+    {t:"Entity‑relationship view in task analysis highlights…",
+     o:["compilers","objects, actions, and people with relationships","CSS variables","cloud SKUs"],
+     a:1,
+     e:"Focus is domain objects and their relationships (e.g., gardener uses spade).",
+    },
+
+    // Application questions
+    {t:"Field observation is preferred over lab when…",
+     o:["you need ecological validity in the user’s real environment","you require strict hardware control","you must eliminate all confounds","budget is unlimited"],
+     a:0,
+     e:"Field captures context and behaviors not reproducible in lab.",
+    },
+    {t:"A good recruiting screener for SIT CS study should consider…",
+     o:["screen color depth","year/trimester and prior experience with the task","favorite font","blood type"],
+     a:1,
+     e:"Representativeness by year/trimester, prior exposure, device, bandwidth, etc.",
+    },
+    {t:"From an interview, a red flag question is…",
+     o:["Walk me through your last attempt to submit an assignment.","Would you use our feature if we built it?","What information do you need before starting?","What happens after you finish the task?"],
+     a:1,
+     e:"Hypotheticals/vanity (‘would you use’) are weaker than behavior‑focused prompts.",
+    },
+    {t:"After task analysis you should be able to…",
+     o:["eliminate needfinding","re‑define scope and support tasks more effectively","skip evaluation","finalize visual theme"],
+     a:1,
+     e:"Outputs inform scope, requirements, and design support for real user tasks.",
+    },
+  ];
+
+  // ===== Render =====
+  const container = document.getElementById('questions');
+  let order = [...BANK.keys()];
+  let score=0, answered=0;
+
+  function render(){
+    document.getElementById('total').textContent = BANK.length;
+    container.innerHTML='';
+    order.forEach((idx,i)=>{
+      const q = BANK[idx];
+      const el = document.createElement('div');
+      el.className='q';
+      el.innerHTML = `
+        <h3>${i+1}. ${q.t}</h3>
+        <div class="opts"></div>
+        <div class="explain hidden"></div>
+      `;
+      const opts = el.querySelector('.opts');
+      const explain = el.querySelector('.explain');
+      q.o.forEach((text,oi)=>{
+        const o = document.createElement('button');
+        o.className='opt';
+        o.innerHTML = `<span class="badge">${String.fromCharCode(65+oi)}</span> <div>${text}</div>`;
+        o.addEventListener('click',()=>{
+          if(o.classList.contains('disabled')) return;
+          [...opts.children].forEach(c=>{c.classList.add('disabled'); c.style.cursor='default'});
+          const correct = oi===q.a;
+          if(correct){ o.classList.add('correct'); score++; }
+          else{ o.classList.add('wrong'); [...opts.children][q.a].classList.add('correct'); }
+          answered++;
+          explain.classList.remove('hidden');
+          explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+          updateStats();
+        }, {once: true});
+        opts.appendChild(o);
+      });
+      container.appendChild(el);
+    });
+    updateStats();
+  }
+
+  function updateStats(){
+    document.getElementById('score').textContent = score;
+    document.getElementById('answered').textContent = answered;
+  }
+
+  function reset(){ score=0; answered=0; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  document.getElementById('shuffle').addEventListener('click',()=>{ order = shuffleArray(order); reset(); });
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('reveal').addEventListener('click',()=>{
+    document.querySelectorAll('.q').forEach((qEl,qi)=>{
+      const idx = order[qi]; const q = BANK[idx];
+      const opts = qEl.querySelectorAll('.opt');
+      opts.forEach((o,oi)=>{ o.classList.add('disabled'); if(oi===q.a) o.classList.add('correct'); });
+      const explain = qEl.querySelector('.explain');
+      explain.classList.remove('hidden');
+      explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

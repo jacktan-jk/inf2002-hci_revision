@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INF2002 – Quizzes & Markdown Notes</title>
+  <style>
+    :root { --maxw:1100px; --accent:#111827; --brand:#2563eb; --muted:#6b7280; }
+    * { box-sizing:border-box }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", sans-serif; line-height:1.5; margin:0; background:#0b1220; color:#e5e7eb; }
+    header { border-bottom:1px solid #1f2937; background:linear-gradient(180deg,#0b1220,#0b1220 60%,#0e1628); }
+    .wrap { max-width:var(--maxw); margin:0 auto; padding:18px 16px; }
+    h1 { margin:0 0 6px; font-size:clamp(20px,2.6vw,28px); }
+    .sub { color:#9ca3af; font-size:14px }
+    main { max-width:var(--maxw); margin:16px auto 40px; padding:0 16px; display:grid; grid-template-columns: 1.1fr .9fr; gap:18px }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr } }
+
+    .card { background:#0f172a; border:1px solid #1f2937; border-radius:14px; padding:14px; box-shadow:0 1px 0 rgba(0,0,0,.35) }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px }
+    .lec { display:flex; flex-direction:column; gap:10px; padding:12px; border:1px solid #1f2937; border-radius:12px; background:#0b1328 }
+    .lec h3 { margin:0; font-size:16px }
+    .lec .tag { color:#93c5fd; font-size:12px }
+    .btns { display:flex; gap:8px; flex-wrap:wrap }
+    a.btn, button.btn { appearance:none; text-decoration:none; cursor:pointer; border:1px solid #1f2937; background:#111827; color:#e5e7eb; padding:8px 12px; border-radius:10px; font-weight:600; font-size:14px }
+    a.btn.primary, button.btn.primary { background:#1e293b; border-color:#3b82f6; color:#e6f0ff }
+    a.btn:hover, button.btn:hover { border-color:#3b82f6 }
+    details { margin-top:10px; color:#9ca3af }
+    details > summary { cursor:pointer }
+
+    /* Notes viewer */
+    .notes { display:flex; flex-direction:column; gap:10px }
+    .notes header { background:transparent; border:0; padding:0 }
+    .notes h2 { margin:0 0 4px; font-size:18px }
+    .notes .bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap }
+    .notes input[type=text] { flex:1; min-width:160px; background:#0b1328; color:#e5e7eb; border:1px solid #1f2937; border-radius:10px; padding:8px 10px }
+    .notes article { min-height:280px; max-height:70vh; overflow:auto; padding:12px; border:1px solid #1f2937; border-radius:12px; background:#0b1328 }
+
+    /* Simple markdown styles */
+    .md h1,.md h2,.md h3,.md h4,.md h5 { margin:.6em 0 .3em }
+    .md h1{font-size:22px}.md h2{font-size:20px}.md h3{font-size:18px}
+    .md p { margin:.5em 0 }
+    .md code { background:#0a1020; border:1px solid #1f2937; padding:.1em .3em; border-radius:6px; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace }
+    .md pre { background:#0a1020; border:1px solid #1f2937; padding:10px; border-radius:10px; overflow:auto }
+    .md ul { margin:.4em 0 .6em 1.2em }
+    .md li { margin:.2em 0 }
+
+    /* Fullscreen styles */
+    #mdOut:fullscreen { 
+      background:#0b1328; 
+      border:none; 
+      width:100vw; 
+      height:100vh; 
+      max-height:none; 
+      padding:20px; 
+      border-radius:0; 
+      box-sizing:border-box; 
+    }
+    #mdOut:fullscreen .md h1{font-size:26px}
+    #mdOut:fullscreen .md h2{font-size:22px}
+    #mdOut:fullscreen .md h3{font-size:20px}
+    #mdOut:fullscreen p{font-size:16px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>INF2002 — Quizzes & Revision Notes</h1>
+      <div class="sub">Lectures 1–6 • Quick links to quizzes • Lightweight Markdown viewer for notes (RFU)</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2 style="margin-top:0">Quizzes</h2>
+      <div class="grid" id="lecGrid"></div>
+      <details>
+        <summary>File naming in this repo</summary>
+        <div style="margin-top:6px">
+          Using your current tree:
+          <pre><code>lecture_1_mcq.html
+lecture_2_mcq.html
+lecture_3_mcq.html
+lecture_4_mcq.html
+lecture_5_mcq.html
+lecture_6_mcq.html
+mini_essay_quiz.html</code></pre>
+        </div>
+      </details>
+    </section>
+
+    <section class="card notes">
+      <header>
+        <h2>Markdown Notes Viewer</h2>
+        <div class="bar">
+          <input id="mdPath" type="text" placeholder="notes/lec1.md" />
+          <button class="btn primary" id="loadBtn" title="Fetch and render the Markdown file">Load</button>
+          <input type="file" id="filePick" accept=".md,.txt,.markdown" style="display:none" />
+          <button class="btn" id="pickBtn" title="Preview a local .md without hosting">Open .md file…</button>
+          <button class="btn" id="fsBtn" title="Toggle fullscreen for the notes viewer">⛶</button>
+        </div>
+      </header>
+      <article id="mdOut" class="md">
+        <p><em>RFU: Notes not finalized. Use “Open .md file…” to preview local drafts, or enter a path if you have notes hosted.</em></p>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    // ---- Data ----
+    const LECTURES = [
+      { no:1, title:"History of HCI & UCD Intro", tag:"HCI foundations", quiz:"lecture_1_mcq.html", notes:"notes/lec1.md" },
+      { no:2, title:"Needfinding & Task Analysis", tag:"Research & HTA/TDH", quiz:"lecture_2_mcq.html", notes:"notes/lec2.md" },
+      { no:3, title:"Usability Principles & Ethics", tag:"Heuristics & ethics", quiz:"lecture_3_mcq.html", notes:"notes/lec3.md" },
+      { no:4, title:"Prototyping (Lo/Hi‑Fi, WoZ)", tag:"Storyboards, fidelity", quiz:"lecture_4_mcq.html", notes:"notes/lec4.md" },
+      { no:5, title:"Evaluation & Heuristics", tag:"Empirical & predictive", quiz:"lecture_5_mcq.html", notes:"notes/lec5.md" },
+	  { no:6, title:"Visual Design", tag:"Visuals", quiz:"lecture_6_mcq.html", notes:"notes/lec6.md" },
+    ];
+
+    const EXTRAS = [
+      { no:"★", title:"Mini‑Essay Practice", tag:"Short/mini‑essay", quiz:"mini_essay_quiz.html", notes:"" }
+    ];
+
+    // ---- Render lecture cards ----
+    const grid = document.getElementById('lecGrid');
+    function card(l){
+      return `
+      <article class="lec">
+        <div>
+          <h3>Lec ${l.no}: ${l.title}</h3>
+          <div class="tag">${l.tag}</div>
+        </div>
+        <div class="btns">
+          <a class="btn primary" href="${l.quiz}" target="_blank" rel="noopener">Open Quiz</a>
+          <button class="btn" data-notes="${l.notes||''}" ${l.notes?"":"disabled title='Notes RFU'"}>Open Notes</button>
+        </div>
+      </article>`;
+    }
+
+    grid.innerHTML = [...LECTURES.map(card), ...EXTRAS.map(card)].join('');
+
+    grid.addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-notes]');
+      if (!b || b.disabled) return;
+      let relativePath = b.dataset.notes;
+      const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+      if (!relativePath.startsWith('http') && !relativePath.startsWith('/')) {
+        relativePath = basePath + '/' + relativePath;
+      }
+      document.getElementById('mdPath').value = relativePath;
+      loadFromPath(relativePath);
+    });
+
+    // ---- Markdown loader (unchanged) ----
+    const out = document.getElementById('mdOut');
+    const pathInput = document.getElementById('mdPath');
+    document.getElementById('loadBtn').addEventListener('click', () => loadFromPath(pathInput.value.trim()))
+
+    const filePick = document.getElementById('filePick');
+    document.getElementById('pickBtn').addEventListener('click', () => filePick.click());
+    filePick.addEventListener('change', async () => {
+      const f = filePick.files?.[0]; if (!f) return;
+      const text = await f.text();
+      out.innerHTML = mdRender(text);
+      out.scrollTop = 0;
+    });
+
+    async function loadFromPath(p) {
+      if (!p) return;
+      try {
+        const res = await fetch(p + (p.includes('?')?'':'?v=' + Date.now()));
+        if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
+        const text = await res.text();
+        out.innerHTML = mdRender(text);
+        out.scrollTop = 0;
+      } catch (err) {
+        out.innerHTML = `<p style="color:#fca5a5"><strong>Could not load:</strong> ${p}. ${err.message}. If opening directly from the file system, your browser may block fetches. Use the “Open .md file…” button or run a local server.</p>`;
+      }
+    }
+
+    function mdRender(src) {
+      let s = src.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      s = s.replace(/```([\s\S]*?)```/g, (m, code) => `@@CODEBLOCK_${btoa(code)}@@`);
+      for (let i=6;i>=1;i--) {
+        const re = new RegExp(`^${'#'.repeat(i)}\\s+(.+)$`, 'gm');
+        s = s.replace(re, (_, t) => `<h${i}>${t.trim()}</h${i}>`);
+      }
+      s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      s = s.replace(/(^|\W)\*([^*]+)\*(?=\W|$)/g, '$1<em>$2</em>');
+      s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+      s = s.replace(/^(?:-\s+.+(?:\n|$))+?/gm, block => {
+        const items = block.trim().split(/\n/).map(l => l.replace(/^[-]\s+/, '').trim()).map(t => `<li>${t}</li>`).join('');
+        return `<ul>${items}</ul>`;
+      });
+      s = s.split(/\n{2,}/).map(chunk => /<\/?(h\d|ul|li|pre|code)/.test(chunk) ? chunk : `<p>${chunk.replace(/\n/g,'<br>')}</p>`).join('\n');
+      s = s.replace(/@@CODEBLOCK_([A-Za-z0-9+/=]+)@@/g, (m, b64) => `<pre><code>${atob(b64)}</code></pre>`);
+      return s;
+    }
+
+    const fsBtn = document.getElementById('fsBtn');
+    fsBtn.addEventListener('click', toggleFullscreen);
+    document.addEventListener('fullscreenchange', syncFsButton);
+
+    function toggleFullscreen() {
+      const el = document.getElementById('mdOut');
+      if (!document.fullscreenElement) { el.requestFullscreen?.(); }
+      else { document.exitFullscreen?.(); }
+    }
+    function syncFsButton() {
+      const active = !!document.fullscreenElement;
+      fsBtn.textContent = active ? 'Exit Fullscreen' : '⛶';
+      fsBtn.classList.toggle('primary', active);
+    }
+  </script>
+</body>
+</html>

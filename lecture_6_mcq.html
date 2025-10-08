@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INF2002 – Lecture 6 MCQ Test</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f172a;--muted:#94a3b8;--text:#e5e7eb;--brand:#2563eb;--ok:#10b981;--err:#ef4444;--card:#111827}
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),#0c1426);border-bottom:1px solid #1f2937}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{margin:0 0 4px;font-size:22px}
+    .sub{color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{appearance:none;border:1px solid #2b3547;background:#111c30;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:white}
+    .stat{display:inline-flex;align-items:center;gap:6px;border:1px solid #2b3547;padding:6px 10px;border-radius:999px;color:var(--muted)}
+    .grid{display:grid;gap:14px}
+    .layout{grid-template-columns:1fr}
+    @media(min-width:980px){.layout{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid #1f2937;border-radius:14px;padding:14px}
+    .q{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px}
+    .q h3{margin:0 0 8px;font-size:15px}
+    .opt{display:flex;gap:8px;align-items:flex-start;padding:10px;border:1px solid #263347;border-radius:10px;background:#0b1220;cursor:pointer;color:#fff}
+    .opt:not(.disabled):hover{border-color:#33507a}
+    .opt.correct{border-color:#064e3b;background:#06251d}
+    .opt.wrong{border-color:#7f1d1d;background:#2f0a0a}
+    .explain{margin-top:8px;color:var(--muted)}
+    .badge{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2b3547;color:#c7d2fe}
+    footer{color:var(--muted);font-size:12px;padding:24px 16px}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+      <div>
+        <h1>INF2002 – Lecture 6 MCQ Test</h1>
+        <div class="sub">Visual Design: Gestalt • Whitespace • Typography • Scanning • Above the Fold • Grids • Rule of Thirds • Color • 30 MCQs</div>
+      </div>
+      <div class="controls">
+        <span class="stat">Score: <b id="score">0</b>/<b id="total">0</b></span>
+        <span class="stat">Answered: <b id="answered">0</b></span>
+        <button class="btn" id="shuffle">Shuffle</button>
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn primary" id="reveal">Reveal All</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap grid layout">
+    <section class="card">
+      <div id="questions" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="muted">Sources: Lecture 6 slides & transcript (Visual Design). For study only.</div>
+  </footer>
+
+<script>
+(function(){
+  function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+  // ===== Question Bank (30) =====
+  const BANK = [
+    // Goals & overview
+    {t:"A core goal of visual design is to…",
+     o:["maximize code reuse","guide users by conveying structure, importance, and relationships","increase GPU usage","avoid grids"],
+     a:1,
+     e:"Slides highlight Guide/Pace/Message; guiding users via hierarchy and relationships is primary."},
+
+    // Gestalt
+    {t:"Gestalt theory primarily explains…",
+     o:["server scaling","how people perceive parts as organized wholes","font licensing","HTTP caching"],
+     a:1,
+     e:"‘The whole is other than the sum of the parts’—we group elements into higher‑order units."},
+    {t:"Which is an example of Proximity?",
+     o:["elements close together are perceived as related","opposite colors on the wheel","all caps headings","left‑aligned paragraphs"],
+     a:0,
+     e:"Nearness suggests grouping; distance suggests separation."},
+    {t:"Similarity groups items that share…",
+     o:["network ports","visual characteristics (e.g., color, shape, size)","identical URLs","SQL schema"],
+     a:1,
+     e:"Uniform visual traits lead viewers to see a set as a group."},
+    {t:"Continuity means viewers prefer…",
+     o:["broken contours","continuous, unbroken paths/lines","random layouts","centered text"],
+     a:1,
+     e:"People interpret intersecting lines as continuous paths rather than abrupt junctions."},
+    {t:"Closure refers to…",
+     o:["filling in missing contours to see complete figures","closing modals quickly","closing tickets","closing color picker"],
+     a:0,
+     e:"We perceive complete shapes even when boundaries are incomplete."},
+    {t:"Figure–ground is illustrated when…",
+     o:["text blurs","perception alternates between object and background (e.g., vase vs faces)","scrolling stops","fonts change"],
+     a:1,
+     e:"Ambiguous images can flip between two interpretations of foreground/background."},
+    {t:"Common fate groups elements that…",
+     o:["share the same motion/direction","share the same license","share the same URL","never move"],
+     a:0,
+     e:"Objects moving together are perceived as related."},
+    {t:"Enclosure/connectedness works by…",
+     o:["rendering at 120Hz","visually enclosing/connecting elements to signal grouping","adding more shadows","increasing saturation"],
+     a:1,
+     e:"Boxes, brackets, rules, or connecting strokes create perceived groups."},
+
+    // Whitespace
+    {t:"Whitespace primarily…",
+     o:["wastes screen area","conveys grouping/relationships and improves readability","only adds margin for print","replaces color"],
+     a:1,
+     e:"Whitespace leads the eye, creates balance, and eases reading."},
+
+    // Typography basics
+    {t:"‘Leading’ is…",
+     o:["space between letters","vertical space between lines of text","font thickness","the first paragraph"],
+     a:1,
+     e:"Leading controls inter‑line spacing; affects readability."},
+    {t:"‘X‑height’ measures…",
+     o:["capital letter height","height of the lowercase ‘x’ (main body of lowercase)","descender length","kerning amount"],
+     a:1,
+     e:"Higher x‑height improves legibility at small sizes."},
+    {t:"Ascenders and descenders are…",
+     o:["icon packs","parts of letters above/below the x‑height/baseline","CSS utilities","grid columns"],
+     a:1,
+     e:"b, d, h ascend; g, p, y descend."},
+    {t:"Kerning adjusts…",
+     o:["line spacing","space between specific letter pairs","font weight","page margins"],
+     a:1,
+     e:"Kerning improves visual harmony by tweaking pair spacing (e.g., AV)."},
+    {t:"Font choice guidance includes…",
+     o:["use uncommon fonts for body text","use common fonts for long text; less‑common ok for logos; change fonts for contrast","never mix serif and sans","incremental tiny changes"],
+     a:1,
+     e:"Slides: common for body, uncommon ok for logos; create real contrast; pair serif/sans thoughtfully."},
+
+    // Scanning behavior
+    {t:"How do users read online?",
+     o:["deeply, line by line","mostly scan; often show an F‑pattern on pages","always read footers first","only images"],
+     a:1,
+     e:"Eye‑tracking shows scanning with top bars then left column sweep (F‑pattern)."},
+    {t:"Design implication of F‑pattern:",
+     o:["bury key info low on the page","place headings/keywords early and along the left","center everything","use only images"],
+     a:1,
+     e:"Put key words and headings where scanning passes first."},
+
+    // Above the fold
+    {t:"‘Above the fold’ is…",
+     o:["anything below the hero","portion visible without scrolling; prime real estate","banner ad region only","foldable phones only"],
+     a:1,
+     e:"Users see this first; place nav and primary CTAs here to set orientation."},
+    {t:"User behavior related to the fold:",
+     o:["users refuse to scroll","users scroll if they expect value","no one reads headlines","fold doesn’t matter"],
+     a:1,
+     e:"Communicate value so users choose to scroll."},
+
+    // Grids & layout
+    {t:"A grid helps by…",
+     o:["adding random lines","organizing content for faster scanning and balance","increasing code size","forcing center alignment"],
+     a:1,
+     e:"Grids provide alignment and reduce clutter."},
+    {t:"Rule of thirds advises…",
+     o:["placing elements at 25%/75% lines","placing key elements along 1/3 lines or their intersections","always centering logos","using three colors only"],
+     a:1,
+     e:"A 3×3 grid; place focal points on lines/intersections (power points)."},
+    {t:"Layout tips from slides include…",
+     o:["allow slight misalignments for variety","extend short elements to start/end on grid boundaries; let long elements span multiple units","center all text","justify every block"],
+     a:1,
+     e:"Consistency and alignment aid scanning; avoid micro‑misalignments."},
+    {t:"For LTR languages, text is easiest to skim when…",
+     o:["center‑aligned","right‑aligned","left‑aligned","justified"],
+     a:2,
+     e:"Left alignment forms a strong scanning anchor."},
+
+    // Color theory
+    {t:"Hue circle (color wheel) organizes…",
+     o:["fonts by weight","colors by hue and their relationships","HTTP codes","grid columns"],
+     a:1,
+     e:"Shows primary, secondary, tertiary and their relations."},
+    {t:"Complementary colors are…",
+     o:["adjacent on the wheel","opposite on the wheel (e.g., red–green, yellow–blue)","random picks","grayscale only"],
+     a:1,
+     e:"Opponents create high contrast; use carefully."},
+    {t:"Analogous scheme uses colors that are…",
+     o:["opposite","next to each other","triad corners","monochrome only"],
+     a:1,
+     e:"Adjacent hues create harmony."},
+    {t:"Triadic scheme uses…",
+     o:["two opposite colors","three evenly spaced hues on the wheel","any black/white/gray","pastels only"],
+     a:1,
+     e:"Balanced, vibrant contrast when balanced in saturation/value."},
+    {t:"Guideline on saturation from slides:",
+     o:["use simultaneous extreme saturations for everything","avoid simultaneous display of highly saturated, spectrally extreme colors; prefer pastels except to draw attention","never use color","only grayscale"],
+     a:1,
+     e:"High simultaneous saturation strains; pastels/readability first; reserve vivid for highlights."},
+    {t:"Conventions and expectations include…",
+     o:["red means success; green means error","red often signals stop/error/attention; green go/ok","colors have no conventional meaning","always invert traffic colors"],
+     a:1,
+     e:"Be consistent with widespread signifiers like red↔stop/alert and green↔go/success."},
+    {t:"How many colors should typical UIs use?",
+     o:["as many as possible","a judicious small set; too many looks cluttered","only one","exactly seven"],
+     a:1,
+     e:"Fewer, consistent colors reduce cognitive load."},
+    {t:"A robust workflow is to…",
+     o:["design in full color first","design for grayscale first, then add color","never test contrast","ignore accessibility"],
+     a:1,
+     e:"Ensure hierarchy works in grayscale; add color to reinforce meaning, not carry it alone."},
+  ];
+
+  // ===== Render =====
+  const container = document.getElementById('questions');
+  let order = [...BANK.keys()];
+  let score=0, answered=0;
+
+  function render(){
+    document.getElementById('total').textContent = BANK.length;
+    container.innerHTML='';
+    order.forEach((idx,i)=>{
+      const q = BANK[idx];
+      const el = document.createElement('div');
+      el.className='q';
+      el.innerHTML = `
+        <h3>${i+1}. ${q.t}</h3>
+        <div class="opts"></div>
+        <div class="explain hidden"></div>
+      `;
+      const opts = el.querySelector('.opts');
+      const explain = el.querySelector('.explain');
+      q.o.forEach((text,oi)=>{
+        const o = document.createElement('button');
+        o.className='opt';
+        o.innerHTML = `<span class="badge">${String.fromCharCode(65+oi)}</span> <div>${text}</div>`;
+        o.addEventListener('click',()=>{
+          if(o.classList.contains('disabled')) return;
+          [...opts.children].forEach(c=>{c.classList.add('disabled'); c.style.cursor='default'});
+          const correct = oi===q.a;
+          if(correct){ o.classList.add('correct'); score++; }
+          else{ o.classList.add('wrong'); [...opts.children][q.a].classList.add('correct'); }
+          answered++;
+          explain.classList.remove('hidden');
+          explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+          updateStats();
+        }, {once: true});
+        opts.appendChild(o);
+      });
+      container.appendChild(el);
+    });
+    updateStats();
+  }
+
+  function updateStats(){
+    document.getElementById('score').textContent = score;
+    document.getElementById('answered').textContent = answered;
+  }
+
+  function reset(){ score=0; answered=0; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  document.getElementById('shuffle').addEventListener('click',()=>{ order = shuffleArray(order); reset(); });
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('reveal').addEventListener('click',()=>{
+    document.querySelectorAll('.q').forEach((qEl,qi)=>{
+      const idx = order[qi]; const q = BANK[idx];
+      const opts = qEl.querySelectorAll('.opt');
+      opts.forEach((o,oi)=>{ o.classList.add('disabled'); if(oi===q.a) o.classList.add('correct'); });
+      const explain = qEl.querySelector('.explain');
+      explain.classList.remove('hidden');
+      explain.innerHTML = `<b>Answer:</b> ${String.fromCharCode(65+q.a)} · ${q.o[q.a]}<br><b>Why:</b> ${q.e}`;
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
